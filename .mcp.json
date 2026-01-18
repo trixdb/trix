@@ -1,0 +1,12 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/mcp-config.json",
+  "mcpServers": {
+    "trix": {
+      "type": "http",
+      "url": "https://mcp.trixdb.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${TRIX_API_KEY}"
+      }
+    }
+  }
+}
