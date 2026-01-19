@@ -24,6 +24,7 @@ The core API server built with Fastify. Handles memory storage, semantic search,
 **Stack:** Node.js 22+, Fastify, PostgreSQL + pgvector, Redis
 
 **Quick Start:**
+
 ```bash
 cd trixdb
 npm install
@@ -38,6 +39,7 @@ Command-line interface for interacting with TrixDB.
 **Stack:** Go 1.23, Cobra, Charmbracelet
 
 **Quick Start:**
+
 ```bash
 cd trixdb-cli-go
 make build
