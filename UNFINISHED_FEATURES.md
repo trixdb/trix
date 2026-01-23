@@ -1,6 +1,6 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 12 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 13 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
@@ -745,9 +745,12 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Files: `trix-workers-node/Dockerfile`, `docker-compose.yml`
   - Replaced wget with Node.js HTTP health check
 
-- [ ] `[M]` **Password validation** - Placeholder not enforced
-  - `POSTGRES_PASSWORD=CHANGE_ME_TO_STRONG_PASSWORD_MIN_12_CHARS`
-  - No validation before docker-compose up
+- [x] `[M]` **Password validation** - ✅ FIXED 2026-01-23
+  - Created `scripts/validate-docker-passwords.sh` for pre-startup validation
+  - Created `scripts/docker-compose-safe.sh` wrapper for safe deployments
+  - Rejects placeholder passwords (CHANGE_ME, etc.)
+  - Enforces minimum 12 character length
+  - Blocks common weak passwords (admin, password, trix_secret, etc.)
 
 ### Monitoring & Alerting
 
@@ -773,8 +776,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### CI/CD Pipeline
 
-- [ ] `[M]` **Pre-deployment validation** - Not automated
-  - `scripts/validate-config.js` exists but not in CI/CD
+- [x] `[M]` **Pre-deployment validation** - ✅ FIXED 2026-01-23
+  - Added `validate:config` npm script to package.json
+  - Added `validate-config` job to ci.yml, deploy.yml, and release.yml workflows
+  - Runs with `--skip-connectivity` flag against `.env.example`
+  - Deployment and release workflows now require config validation to pass
 
 - [x] `[S]` **Migration validation** - ✅ FIXED 2026-01-23
   - Added validate-migrations.yml workflow to CI pipeline
