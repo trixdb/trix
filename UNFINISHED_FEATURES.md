@@ -1,6 +1,6 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 5 [XL] + 1 [XXL] items fixed, 1 skipped)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
 
 ## Progress Overview
 
@@ -9,7 +9,7 @@ Overall Progress: [████████████░░░░░░░░�
 
 By Component:
 ├── trix-api        [████████████████████] 100% (30/30) ✓
-├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
+├── trix-cli-go     [█████████░░░░░░░░░░░] 43%  (13/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
@@ -186,9 +186,12 @@ Estimated Total Effort: ~133 developer-days (15.5 days completed)
   - Now tests actual MCP server connectivity instead of skipping
   - Commit: 0c40e6d
 
-- [ ] `[XL]` **Semantic contradiction detection** - Stub implementation
-  - File: `cmd/contradictions.go` (lines 143-181)
-  - Returns empty results, needs LLM-powered analysis
+- [x] `[XL]` **Semantic contradiction detection** - ✅ FIXED 2026-01-23
+  - File: `cmd/contradictions.go` (lines 143-228)
+  - Implemented SemanticDetector.Detect() using /conflicts/scan API endpoint
+  - LLM-powered semantic contradiction detection via trix-api
+  - Added comprehensive tests in `cmd/contradictions_test.go` (TDD approach)
+  - Commit: feat(cli): implement semantic contradiction detection
 
 ### High Priority
 
