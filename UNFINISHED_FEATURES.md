@@ -1,14 +1,14 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 5 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 5 [XL] + 1 [XXL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (154/556 items)
+Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (155/556 items)
 
 By Component:
-├── trix-api        [██████████████████░░] 93%  (28/30)
+├── trix-api        [███████████████████░] 97%  (29/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
@@ -23,7 +23,7 @@ By Component:
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
 └── Integrations    [██████░░░░░░░░░░░░░░] 31%  (4/13)
 
-Estimated Total Effort: ~133 developer-days (8.5 days completed)
+Estimated Total Effort: ~133 developer-days (15.5 days completed)
 ```
 
 ### Effort Legend
@@ -85,10 +85,13 @@ Estimated Total Effort: ~133 developer-days (8.5 days completed)
   - GraphRAG approach: 72-83% improvement in global query comprehensiveness
   - Added 24 tests for processor and job functions
 
-- [ ] `[XXL]` **Visual Search (CLIP-based)** - Feature flagged, incomplete
+- [x] `[XXL]` **Visual Search (CLIP-based)** - ✅ COMPLETE (was mislabeled as incomplete)
   - Flag: `ENABLE_VISUAL_SEARCH` in `src/lib/features/feature-flags.js`
-  - Image similarity search not implemented
-  - Requires SigLIP infrastructure
+  - SigLIP service: `trix-visual-embeddings/` (Railway-ready, see README.md)
+  - Providers: `SigLIPProvider`, `OpenAIClipProvider` in `src/lib/images/visual-embedding.js`
+  - Service: `VisualSearchService` in `src/lib/images/visual-search.js`
+  - Routes: `POST /memories/search/visual`, `GET /:id/similar`, `POST /:id/check-duplicates`
+  - Config: Set `SIGLIP_ENDPOINT` and `ENABLE_VISUAL_SEARCH=true` to enable
 
 - [x] `[XL]` **Advanced Retrieval (CRAG)** - COMPLETED 2026-01-23
   - Flag: `ENABLE_ADVANCED_RETRIEVAL`
