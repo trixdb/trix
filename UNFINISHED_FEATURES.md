@@ -1,23 +1,23 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 13 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 14 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (132/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (133/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
-├── trix-mcp        [██████████░░░░░░░░░░] 50%  (5/10)
+├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 10%  (18/180)
 ├── Migrations      [███░░░░░░░░░░░░░░░░░] 17%  (1/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [████░░░░░░░░░░░░░░░░] 15%  (2/13)
-├── Configuration   [█████░░░░░░░░░░░░░░░] 25%  (13/52)
+├── Security        [████░░░░░░░░░░░░░░░░] 23%  (3/13)
+├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
 ├── Documentation   [████░░░░░░░░░░░░░░░░] 20%  (2/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
@@ -372,7 +372,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### High Priority
 - [ ] `[M]` Add webhook idempotency tracking
-- [ ] `[M]` Add row-level locking in saveTranscript
+- [x] `[M]` Add row-level locking in saveTranscript - ✅ FIXED 2026-01-23
+  - Added explicit SELECT FOR UPDATE at transaction start in AudioTranscriptRepository
+  - Prevents concurrent webhook callbacks from corrupting data
 - [x] `[S]` Add unique constraints to prevent duplicate segments - ✅ FIXED 2026-01-23
   - Added migration for unique index on (audio_file_id, start_time, end_time)
 - [x] `[S]` Fix AbortController timer leaks - FIXED 2026-01-23
