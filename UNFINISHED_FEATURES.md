@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 3 [L] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 4 [L] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 27% (147/556 items)
+Overall Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 27% (148/556 items)
 
 By Component:
 ├── trix-api        [███████████████░░░░░] 73%  (22/30)
@@ -16,7 +16,7 @@ By Component:
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
 ├── Migrations      [██████░░░░░░░░░░░░░░] 33%  (2/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [████████████░░░░░░░░] 62%  (8/13)
+├── Security        [█████████████░░░░░░░] 69%  (9/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
 ├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
@@ -714,11 +714,13 @@ Estimated Total Effort: ~133 developer-days (5.2 days completed)
   - Context expansion now only applies AFTER minimum duration check passes
   - Added 15 comprehensive tests in `tests/routes/audio/clip-duration-bypass.test.js`
 
-- [ ] `[L]` **Issue 015: Buffer Exhaustion in Transcription Download**
-  - File: `issues/015-buffer-exhaustion-fix.md`
-  - Location: `src/lib/audio/transcription-processor.js:50-70`
-  - Problem: Size check after chunks collected, stream not closed on error
-  - Risk: CWE-770 DoS/Memory Exhaustion
+- [x] `[L]` **Issue 015: Buffer Exhaustion in Transcription Download** - ✅ FIXED 2026-01-23
+  - Location: `src/lib/audio/transcription-processor.js:49-92`
+  - Fix: Pre-download size check via S3 HEAD request (lines 49-61)
+  - Size check BEFORE pushing chunks to array (lines 70-75)
+  - Stream cleanup: clear chunks array and destroy stream on error (lines 77-82)
+  - Defense-in-depth: streaming check still enforces limit for metadata mismatches
+  - Added 13 comprehensive tests in `tests/lib/audio/transcription-processor-buffer-exhaustion.test.js`
 
 ### High Priority Security Items
 
