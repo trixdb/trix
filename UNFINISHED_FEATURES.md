@@ -705,9 +705,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### High Priority Security Items
 
-- [ ] `[M]` **CSP unsafe-inline stylesheet**
-  - File: `src/plugins/helmet.js:34`
-  - Issue: `styleSrc: ["'self'", 'https:', "'unsafe-inline'"]`
+- [x] `[M]` **CSP unsafe-inline stylesheet** - FIXED 2026-01-23
+  - File: `src/plugins/helmet.js`
+  - Replaced 'unsafe-inline' with CSP nonces (enableCSPNonces: true)
+  - Updated email-unsubscribe.js, oauth.js, sessions.js to use nonce in style tags
 
 - [x] `[S]` **Password change token invalidation incomplete** - FIXED 2026-01-23
   - File: `src/routes/users.js:115-130` and `src/routes/auth.js`
@@ -1004,13 +1005,14 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Hardcoded API Versions
 
-- [ ] `[M]` **Google API versions** - Not configurable
-  - File: `trix-api/src/integrations/providers/google/utils/constants.js` (lines 11-13)
-  - Gmail v1, Calendar v3, Drive v3 hardcoded
+- [x] `[M]` **Google API versions** - ✅ FIXED 2026-01-23
+  - File: `trix-api/src/integrations/providers/google/utils/constants.js`
+  - Made configurable via GOOGLE_GMAIL_API_VERSION, GOOGLE_CALENDAR_API_VERSION, GOOGLE_DRIVE_API_VERSION env vars
+  - Defaults: Gmail v1, Calendar v3, Drive v3
 
-- [ ] `[M]` **Microsoft Graph API version** - Not configurable
-  - File: `trix-api/src/integrations/providers/microsoft/index.js` (line 26)
-  - v1.0 hardcoded
+- [x] `[S]` **Microsoft Graph API version** - ✅ FIXED 2026-01-23
+  - File: `trix-api/src/integrations/providers/microsoft/index.js`
+  - Made configurable via MICROSOFT_GRAPH_API_VERSION env var (default: v1.0)
 
 - [x] `[S]` **Notion API version** - ✅ FIXED 2026-01-23
   - File: `trix-api/src/integrations/providers/notion/index.js`
