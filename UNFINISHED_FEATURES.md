@@ -779,7 +779,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [x] `[S]` **No log level validation** - ✅ FIXED 2026-01-23
   - Added validation in trix-api/src/lib/logger.js and trix-workers-node/src/lib/logger.js
   - Invalid log levels now warn and default to 'info'
-- [ ] `[M]` **No log rotation policy** - Retention not specified
+- [x] `[M]` **No log rotation policy** - ✅ FIXED 2026-01-23
+  - Added LOG_MAX_SIZE, LOG_MAX_FILES, LOG_COMPRESS environment variables
+  - Updated logger.js with getLogRotationConfig() function
+  - Documented in CLAUDE.md and .env.example
 - [ ] `[M]` **Structured logging inconsistent** - Some JSON, some pino
 
 ### CI/CD Pipeline
