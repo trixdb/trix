@@ -1,14 +1,14 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 4 [L] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 4 [L] + 3 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 27% (148/556 items)
+Overall Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 27% (149/556 items)
 
 By Component:
-├── trix-api        [███████████████░░░░░] 73%  (22/30)
+├── trix-api        [████████████████░░░░] 77%  (23/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
@@ -77,23 +77,35 @@ Estimated Total Effort: ~133 developer-days (5.2 days completed)
 
 ### High Priority
 
-- [ ] `[XL]` **Community Summarization (Phase 2)** - Not started
-  - File: `src/jobs/summarization-job.js` (lines 90-107)
-  - Job registration commented out
-  - Hierarchical community summaries across clusters
+- [x] `[XL]` **Community Summarization (Phase 2)** - COMPLETED 2026-01-23
+  - File: `src/jobs/summarization-job.js` - Weekly job registered (Sundays 3 AM)
+  - Created `src/lib/enrichment/processors/community-summary-processor.js`
+  - Hierarchical community summaries: Level 0 (fine-grained) -> Level 1 (mid-level) -> Level 2 (themes)
+  - Bottom-up processing ensures child summaries exist for parent aggregation
+  - GraphRAG approach: 72-83% improvement in global query comprehensiveness
+  - Added 24 tests for processor and job functions
 
 - [ ] `[XXL]` **Visual Search (CLIP-based)** - Feature flagged, incomplete
   - Flag: `ENABLE_VISUAL_SEARCH` in `src/lib/features/feature-flags.js`
   - Image similarity search not implemented
   - Requires SigLIP infrastructure
 
-- [ ] `[XL]` **Advanced Retrieval (CRAG)** - Feature flagged, incomplete
+- [x] `[XL]` **Advanced Retrieval (CRAG)** - COMPLETED 2026-01-23
   - Flag: `ENABLE_ADVANCED_RETRIEVAL`
-  - Query expansion, reranking, CRAG validation pending
+  - Implemented query expansion (HyDE, multi-query), reranking (Cohere, mock), CRAG validation
+  - Integrated with unified feature flag system (master switch + granular controls)
+  - Added 203 comprehensive tests covering all CRAG components
+  - Config: `src/lib/retrieval/config.js` integrates with `Features.ADVANCED_RETRIEVAL`
 
-- [ ] `[L]` **Graph Expansion** - Feature flagged, incomplete
+- [x] `[L]` **Graph Expansion** - ✅ FIXED 2026-01-23
   - Flag: `ENABLE_GRAPH_EXPANSION`
-  - Graph-based query expansion not implemented
+  - Created `GraphQueryExpansion` service in `src/lib/graph/services/GraphQueryExpansion.js`
+  - Integrated with `SearchService` via `enableGraphExpansion` option in semanticSearch and hybridSearch
+  - Expands search results using knowledge graph relationships (related_to, supersedes, references, etc.)
+  - Feature flag checking via `isFeatureEnabled(Features.GRAPH_EXPANSION, account)`
+  - Graceful degradation: returns original results on error or when feature disabled
+  - Added comprehensive tests in `tests/lib/graph/services/GraphQueryExpansion.test.js`
+  - Added SearchService integration tests in `tests/services/SearchService-graph-expansion.test.js`
 
 ### Medium Priority
 
@@ -122,9 +134,14 @@ Estimated Total Effort: ~133 developer-days (5.2 days completed)
 
 ### Low Priority
 
-- [ ] `[L]` **Async backup processing** - TODO in code
-  - File: `src/routes/admin/backups.js` (line 70)
-  - Implement via BullMQ when backup workers available
+- [x] `[L]` **Async backup processing** - ✅ FIXED 2026-01-23
+  - File: `src/routes/admin/backups.js`
+  - Added BACKUP queue to BullMQ with 30-minute timeout for large backups
+  - Route now queues jobs via `bullmq.enqueueBackup()` instead of sync processing
+  - Added job status tracking: `GET /admin/backups/:id/status` returns job progress
+  - Backup record stores job_id in metadata for correlation
+  - Queue stats included in `/admin/backups/stats` response
+  - Tests: `tests/jobs/async-backup-processing.test.js`
 
 - [x] `[XS]` **Guide view analytics storage** - ✅ FIXED 2026-01-23
   - File: `src/routes/changelog-guides.js` (line 51)
