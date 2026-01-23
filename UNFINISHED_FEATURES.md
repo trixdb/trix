@@ -171,9 +171,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `internal/api/analytics.go` (line 336)
   - Returns empty ClusterMembership struct
 
-- [ ] `[S]` **Memory insights recent access** - Missing data
+- [x] `[S]` **Memory insights recent access** - ✅ FIXED 2026-01-23
   - File: `internal/api/analytics.go` (line 323)
-  - RecentAccesses hardcoded to 0
+  - Calculates recent accesses based on accessed_at timestamp
 
 ### Sprint 3: Code Quality & Architecture
 
@@ -264,8 +264,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `tests/e2e/mcp-protocol.test.ts` (lines 188, 548)
   - resources/list handling skipped
 
-- [ ] `[S]` **Redis connection error handling test** - Skipped
+- [x] `[S]` **Redis connection error handling test** - ✅ FIXED 2026-01-23
   - File: `tests/unit/storage/RedisSessionStore.test.ts` (line 346)
+  - Rewrote test to use vitest mocking instead of invalid Redis URL
 
 ---
 
@@ -304,7 +305,8 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### Medium Priority
 - [ ] `[M]` Add metrics for key operations
-- [ ] `[S]` Complete structured logging fields
+- [x] `[S]` Complete structured logging fields - ✅ FIXED 2026-01-23
+  - Added op, status, errorType fields to 40+ logging statements in notification services
 - [ ] `[M]` Add audit trail for email address operations
 - [ ] `[L]` Implement email address verification/warmup
 - [ ] `[M]` Complete input validation on metadata extraction
@@ -514,10 +516,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### LLM Provider Resource Leak Tests (10 incomplete)
 - [ ] `[M]` OpenAI stream cleanup on timeout
-- [ ] `[S]` OpenAI abort signals
+- [x] `[S]` OpenAI abort signals - ✅ FIXED 2026-01-23 - Added proper AbortController mocking
 - [ ] `[M]` OpenAI concurrent resource cleanup
 - [ ] `[M]` Gemini stream cleanup on timeout
-- [ ] `[S]` Gemini abort signals
+- [x] `[S]` Gemini abort signals - ✅ FIXED 2026-01-23 - Added proper AbortController mocking
 
 #### Job Queue Dual Storage Tests (8 incomplete)
 - [ ] `[M]` PostgreSQL sync functionality
@@ -526,11 +528,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### trix-api - Webhook Tests (5 skipped)
 
-- [ ] `[S]` Webhook auth test 1 - `tests/routes/webhooks-assemblyai.test.js:146`
-- [ ] `[S]` Webhook auth test 2 - `tests/routes/webhooks-assemblyai.test.js:172`
-- [ ] `[S]` Webhook auth test 3 - `tests/routes/webhooks-assemblyai.test.js:198`
-- [ ] `[S]` Webhook auth test 4 - `tests/routes/webhooks-assemblyai.test.js:330`
-- [ ] `[S]` Webhook auth test 5 - `tests/routes/webhooks-assemblyai.test.js:373`
+- [x] `[S]` Webhook auth test 1 - ✅ FIXED 2026-01-23 - Enabled by fixing route secret loading
+- [x] `[S]` Webhook auth test 2 - ✅ FIXED 2026-01-23 - Tests webhook header validation
+- [x] `[S]` Webhook auth test 3 - ✅ FIXED 2026-01-23 - Tests invalid auth header rejection
+- [x] `[S]` Webhook auth test 4 - ✅ FIXED 2026-01-23 - Tests secret not leaked in errors
+- [x] `[S]` Webhook auth test 5 - ✅ FIXED 2026-01-23 - Tests null byte rejection
 
 ### trix-landing - Critical Coverage Gap
 
