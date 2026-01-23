@@ -159,9 +159,12 @@ Estimated Total Effort: ~133 developer-days (5.2 days completed)
   - CalDAV polling only (15-minute intervals)
   - Requires Apple push notification service integration
 
-- [ ] `[L]` **Google Calendar webhooks** - Not implemented
+- [x] `[L]` **Google Calendar webhooks** - ✅ FIXED 2026-01-23
   - File: `src/integrations/providers/google/services/calendar-service.js`
-  - Polling only, no webhook support
+  - Implemented: createCalendarWebhook(), stopCalendarWebhook(), parseCalendarWebhookNotification(), syncCalendarEvents()
+  - Created webhook route handler at `src/routes/webhooks-google.js`
+  - Supports: push notifications, token verification, incremental sync
+  - Added 16 comprehensive tests in `tests/integrations/google-calendar-webhooks.test.js`
 
 ---
 
