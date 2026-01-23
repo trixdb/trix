@@ -128,9 +128,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Store in analytics database instead of console.log
   - Commit: `6394312` - Added hashIP() helper and guide_views migration
 
-- [ ] `[S]` **Email template IDs** - Placeholder values
-  - File: `src/notifications/services/email-service.js` (lines 127-145)
-  - Replace placeholder IDs with actual Loops transactional IDs
+- [x] `[S]` **Email template IDs** - ✅ DOCUMENTED 2026-01-23
+  - File: `src/notifications/services/email-service.js` (lines 148-242)
+  - Added env var overrides (LOOPS_TEMPLATE_*) for all template IDs
+  - Documented configured vs placeholder templates in code comments
+  - Added all template env vars to .env.example with instructions
 
 - [ ] `[XL]` **Apple Calendar webhooks** - Not supported
   - File: `src/integrations/providers/apple/index.js`
