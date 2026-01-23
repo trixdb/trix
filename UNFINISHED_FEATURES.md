@@ -1,6 +1,6 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 4 [L] + 3 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 5 [L] + 3 [XL] items fixed)
 
 ## Progress Overview
 
