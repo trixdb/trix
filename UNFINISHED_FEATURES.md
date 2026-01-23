@@ -70,7 +70,7 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Add cleanup job for old deleted data
 
 - [x] `[M]` **Credit alert notifications** - ✅ FIXED 2026-01-23
-  - File: `src/billing/middleware/credit-guard.js` (line 73)
+  - File: `src/billing/middleware/credit-guard.js` (lines 265-277)
   - Implemented checkAndTriggerAlerts() to send percentage-based alerts (75%, 90%, 100%)
   - Commit: b7611c3
 
@@ -876,8 +876,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [ ] `[M]` **Microsoft OAuth documentation** - Coming soon
   - File: `trix-api/docs/api/authentication.md` line 271
 
-- [ ] `[M]` **Apple OAuth documentation** - Coming soon
-  - File: `trix-api/docs/api/authentication.md` line 272
+- [x] `[M]` **Apple OAuth documentation** - ✅ FIXED 2026-01-23
+  - File: `trix-api/docs/api/authentication.md`
+  - Added comprehensive documentation for Apple iCloud Calendar via CalDAV
+  - Covers: setup, app-specific passwords, API endpoints, polling strategy, error handling, security
+  - Commit: 26dc94e
 
 - [ ] `[M]` **Graph API OpenAPI spec** - TODO
   - File: `trix-research/product/graph/GRAPH_IMPLEMENTATION_SUMMARY.md` line 329
