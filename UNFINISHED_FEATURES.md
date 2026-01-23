@@ -875,8 +875,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `trix-api/docs/development/testing.md` (created)
   - Covers: test organization, running tests, writing tests, fixtures, mocking, database setup, coverage, CI
 
-- [ ] `[M]` **Microsoft OAuth documentation** - Coming soon
-  - File: `trix-api/docs/api/authentication.md` line 271
+- [x] `[M]` **Microsoft OAuth documentation** - ✅ FIXED 2026-01-23
+  - File: `trix-api/docs/api/authentication.md`
+  - Added comprehensive documentation including Azure AD setup, scopes, endpoints, error handling, and webhook support
+  - Commit: e538cca
 
 - [x] `[M]` **Apple OAuth documentation** - ✅ FIXED 2026-01-23
   - File: `trix-api/docs/api/authentication.md`
