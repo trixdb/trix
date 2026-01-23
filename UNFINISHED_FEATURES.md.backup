@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 20 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 16 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (139/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (135/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
@@ -18,12 +18,12 @@ By Component:
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [█████░░░░░░░░░░░░░░░] 31%  (4/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
-├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
+├── Documentation   [████░░░░░░░░░░░░░░░░] 20%  (2/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
-└── Integrations    [███░░░░░░░░░░░░░░░░░] 23%  (3/13)
+└── Integrations    [██░░░░░░░░░░░░░░░░░░]  8%  (1/13)
 
-Estimated Total Effort: ~133 developer-days (3.8 days completed)
+Estimated Total Effort: ~133 developer-days (3 days completed)
 ```
 
 ### Effort Legend
@@ -69,10 +69,9 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
   - Create SegmentRepository class
   - Add cleanup job for old deleted data
 
-- [x] `[M]` **Credit alert notifications** - ✅ FIXED 2026-01-23
-  - File: `src/billing/middleware/credit-guard.js` (lines 265-277)
-  - Implemented checkAndTriggerAlerts() to send percentage-based alerts (75%, 90%, 100%)
-  - Commit: b7611c3
+- [ ] `[M]` **Credit alert notifications** - Trigger not implemented
+  - File: `src/billing/middleware/credit-guard.js` (line 73)
+  - Low credit detection works but doesn't send notifications
 
 ### High Priority
 
@@ -652,11 +651,9 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
 
 ### Deprecated API Routes
 
-- [x] `[M]` **Unversioned routes** - ✅ FIXED 2026-01-23
-  - File: `trix-api/src/server.js`
-  - Added /v1 prefix to all routes: `/auth`, `/users`, `/admin`, `/files`, `/accounts`, `/spaces`, `/memories`
-  - Maintained backward compatibility with deprecation warnings (Deprecation, Sunset, Link headers)
-  - Legacy routes log warnings and will be removed in v2.0.0
+- [ ] `[M]` **Unversioned routes** - Should use /v1 prefix
+  - File: `src/server.js:456`
+  - Routes: `/auth`, `/users`, `/admin`, `/files`, `/accounts`, `/spaces`, `/memories`
 
 ### CLI Deprecated Flags
 
@@ -793,12 +790,7 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
   - Added LOG_MAX_SIZE, LOG_MAX_FILES, LOG_COMPRESS environment variables
   - Updated logger.js with getLogRotationConfig() function
   - Documented in CLAUDE.md and .env.example
-- [x] `[M]` **Structured logging inconsistent** - ✅ FIXED 2026-01-23
-  - Replaced console.log/error/warn with pino logger in critical files
-  - Updated: TransactionManager, content-offloader, s3-cleanup-queue, tiered-cache
-  - Updated: activity-logger, json-utils, memory-conflict-detector
-  - All use createComponentLogger() for consistent structured logging
-  - Commit: d545a71
+- [ ] `[M]` **Structured logging inconsistent** - Some JSON, some pino
 
 ### CI/CD Pipeline
 
@@ -880,16 +872,11 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
   - File: `trix-api/docs/development/testing.md` (created)
   - Covers: test organization, running tests, writing tests, fixtures, mocking, database setup, coverage, CI
 
-- [x] `[M]` **Microsoft OAuth documentation** - ✅ FIXED 2026-01-23
-  - File: `trix-api/docs/api/authentication.md`
-  - Added comprehensive documentation including Azure AD setup, scopes, endpoints, error handling, and webhook support
-  - Commit: e538cca
+- [ ] `[M]` **Microsoft OAuth documentation** - Coming soon
+  - File: `trix-api/docs/api/authentication.md` line 271
 
-- [x] `[M]` **Apple OAuth documentation** - ✅ FIXED 2026-01-23
-  - File: `trix-api/docs/api/authentication.md`
-  - Added comprehensive documentation for Apple iCloud Calendar via CalDAV
-  - Covers: setup, app-specific passwords, API endpoints, polling strategy, error handling, security
-  - Commit: 26dc94e
+- [ ] `[M]` **Apple OAuth documentation** - Coming soon
+  - File: `trix-api/docs/api/authentication.md` line 272
 
 - [ ] `[M]` **Graph API OpenAPI spec** - TODO
   - File: `trix-research/product/graph/GRAPH_IMPLEMENTATION_SUMMARY.md` line 329
@@ -1067,20 +1054,13 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
   - Configurable via GOOGLE_OAUTH_RETRY_COUNT env var (default: 3)
   - Logs retry attempts at debug level
 
-- [x] `[M]` **Microsoft OAuth token refresh retry** - ✅ FIXED 2026-01-23
+- [ ] `[M]` **Microsoft OAuth token refresh retry** - No retry
   - File: `trix-api/src/integrations/providers/microsoft/index.js`
-  - Added exponential backoff retry (1s, 2s, 4s) for transient errors (5xx, network, timeouts)
-  - Configurable via MICROSOFT_OAUTH_RETRY_COUNT env var (default: 3)
-  - Logs retry attempts at debug level
-  - Added 15 comprehensive tests in `tests/integrations/microsoft-oauth-retry.test.js`
-  - Commit: 0cc5f3a
+  - Same pattern as Google
 
-- [x] `[M]` **Paddle webhook retry** - ✅ FIXED 2026-01-23
-  - Created `trix-api/src/jobs/paddle-webhook-retry-job.js` with scheduled retry job
-  - Runs every 5 minutes to retry failed webhook events (max 5 retries)
-  - Supports distributed locking via Redis for multi-instance deployments
-  - Includes dry-run mode and metrics reporting
-  - Added comprehensive tests (17 test cases)
+- [ ] `[M]` **Paddle webhook retry** - Incomplete
+  - File: `trix-api/src/billing/webhooks/paddle-webhook-handler.js`
+  - getPendingWebhookEvents exists but incomplete
 
 ### Missing Fallback Strategies
 
@@ -1092,15 +1072,9 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
   - Files: `trix-api/src/integrations/lib/circuit-breaker.js`, `circuit-breaker-registry.js`
   - When circuit opens, could return cached data
 
-- [x] `[M]` **Webhook delivery fallback** - ✅ FIXED 2026-01-23
+- [ ] `[M]` **Webhook delivery fallback** - No alternative delivery
   - File: `trix-api/src/lib/webhook-service.js`
-  - Added fallback_urls support to webhooks table (array of backup URLs)
-  - Created deliverWebhookToUrl() to deliver to specific URLs
-  - Enhanced deliverWebhook() to try fallback URLs when primary fails
-  - Added notifyWebhookFailure() to alert admins on permanent failures
-  - Created webhook_failure_notifications table for tracking failures
-  - Added 13 comprehensive tests in tests/lib/webhook-service-fallback.test.js
-  - Commit: 5f91919
+  - Only retries same endpoint
 
 ### Missing Integration Tests
 
