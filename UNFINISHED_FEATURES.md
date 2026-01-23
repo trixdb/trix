@@ -1025,9 +1025,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Missing Rate Limiting (Outbound)
 
-- [ ] `[M]` **N8N provider rate limiting** - Not implemented
+- [x] `[M]` **N8N provider rate limiting** - FIXED 2026-01-23
   - File: `trix-api/src/integrations/providers/n8n/index.js`
-  - No throttling for outbound N8N webhook calls
+  - Added token bucket rate limiting via N8N_RATE_LIMIT_PER_MINUTE env var (default: 60)
+  - Includes automatic queuing for requests that exceed the rate limit
 
 - [x] `[M]` **Zapier provider rate limiting** - FIXED 2026-01-23
   - File: `trix-api/src/integrations/providers/zapier/index.js`
