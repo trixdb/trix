@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 22 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 22 [M] + 1 [L] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (139/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (141/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
@@ -14,9 +14,9 @@ By Component:
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
-├── Migrations      [███░░░░░░░░░░░░░░░░░] 17%  (1/6)
+├── Migrations      [██████░░░░░░░░░░░░░░] 33%  (2/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [██████░░░░░░░░░░░░░░] 38%  (5/13)
+├── Security        [███████░░░░░░░░░░░░░] 46%  (6/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
 ├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
@@ -578,10 +578,10 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
 
 ### Critical - Blocked Migrations
 
-- [ ] `[L]` **Job Queue Persistence** - Entire migration commented out
+- [x] `[L]` **Job Queue Persistence** - FIXED 2026-01-23
   - File: `migrations/20260107100000_job_queue_persistence.js`
-  - Issue: Uses Knex syntax instead of node-pg-migrate
-  - TODO: Rewrite using pgm.sql() or pgm.createTable()
+  - Rewrote migration using node-pg-migrate syntax (pgm.createTable, pgm.createIndex, etc.)
+  - Table includes: job_type, queue_name, priority, payload, status, error tracking, retry management, heartbeat detection
 
 - [ ] `[XL]` **Foreign Key Cascades** - Entire migration commented out
   - File: `migrations/20260106000000_add_update_cascade_to_foreign_keys.js`
