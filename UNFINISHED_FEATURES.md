@@ -371,7 +371,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Updated transcription-job.js and transcription-processor.js to use it
 
 #### High Priority
-- [ ] `[M]` Add webhook idempotency tracking
+- [x] `[M]` Add webhook idempotency tracking - ✅ FIXED 2026-01-23
+  - Uses `webhook_deliveries` table with `UNIQUE` constraint on `event_id`
+  - `INSERT ON CONFLICT DO NOTHING` prevents duplicate processing
+  - Returns success to webhook sender even for duplicates (idempotent response)
 - [x] `[M]` Add row-level locking in saveTranscript - ✅ FIXED 2026-01-23
   - Added explicit SELECT FOR UPDATE at transaction start in AudioTranscriptRepository
   - Prevents concurrent webhook callbacks from corrupting data
