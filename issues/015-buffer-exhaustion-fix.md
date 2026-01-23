@@ -1,5 +1,7 @@
 # Issue 015: Fix Buffer Exhaustion in Transcription Download
 
+**STATUS: RESOLVED** (2026-01-23)
+
 ## Problem
 Buffer exhaustion occurs because size check happens after chunks are already collected.
 
@@ -45,12 +47,13 @@ for await (const chunk of s3Response.body) {
 ```
 
 ## Acceptance Criteria
-- [ ] Size checked before chunk added to array
-- [ ] Stream closed on size exceeded
-- [ ] Memory freed on error
-- [ ] Clear error message with limit value
-- [ ] Unit test for oversized file handling
-- [ ] Memory usage test during error
+- [x] Size checked before chunk added to array
+- [x] Stream closed on size exceeded
+- [x] Memory freed on error
+- [x] Clear error message with limit value
+- [x] Unit test for oversized file handling
+- [x] Memory usage test during error
+- [x] Pre-download size check via S3 HEAD request (bonus - most efficient)
 
 ## TDD Tasks
 1. Write failing test for early termination
