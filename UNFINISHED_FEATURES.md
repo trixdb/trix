@@ -234,13 +234,13 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### High Priority
 
-- [ ] `[M]` **Restore memory endpoint** - Client ready, backend missing
-  - File: `src/client/modules/MemoriesClient.ts` (lines 76-82)
-  - POST `/v1/memories/:id/restore` not implemented in trix-api
+- [x] `[M]` **Restore memory endpoint** - COMPLETED
+  - POST `/v1/memories/:id/restore` implemented in `trix-api/src/routes/memories/single.js`
+  - Client: `trix-mcp/src/client/modules/MemoriesClient.ts`
 
-- [ ] `[M]` **Soft delete memory endpoint** - Client ready, backend missing
-  - File: `src/client/modules/MemoriesClient.ts` (lines 84-90)
-  - DELETE `/v1/memories/:id?soft=true` not handled in trix-api
+- [x] `[M]` **Soft delete memory endpoint** - COMPLETED
+  - DELETE `/v1/memories/:id?soft=true` implemented in `trix-api/src/routes/memories/single.js`
+  - Client: `trix-mcp/src/client/modules/MemoriesClient.ts`
 
 ### Medium Priority
 
