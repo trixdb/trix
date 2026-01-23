@@ -652,9 +652,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Deprecated API Routes
 
-- [ ] `[M]` **Unversioned routes** - Should use /v1 prefix
-  - File: `src/server.js:456`
-  - Routes: `/auth`, `/users`, `/admin`, `/files`, `/accounts`, `/spaces`, `/memories`
+- [x] `[M]` **Unversioned routes** - ✅ FIXED 2026-01-23
+  - File: `trix-api/src/server.js`
+  - Added /v1 prefix to all routes: `/auth`, `/users`, `/admin`, `/files`, `/accounts`, `/spaces`, `/memories`
+  - Maintained backward compatibility with deprecation warnings (Deprecation, Sunset, Link headers)
+  - Legacy routes log warnings and will be removed in v2.0.0
 
 ### CLI Deprecated Flags
 
@@ -1058,13 +1060,20 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Configurable via GOOGLE_OAUTH_RETRY_COUNT env var (default: 3)
   - Logs retry attempts at debug level
 
-- [ ] `[M]` **Microsoft OAuth token refresh retry** - No retry
+- [x] `[M]` **Microsoft OAuth token refresh retry** - ✅ FIXED 2026-01-23
   - File: `trix-api/src/integrations/providers/microsoft/index.js`
-  - Same pattern as Google
+  - Added exponential backoff retry (1s, 2s, 4s) for transient errors (5xx, network, timeouts)
+  - Configurable via MICROSOFT_OAUTH_RETRY_COUNT env var (default: 3)
+  - Logs retry attempts at debug level
+  - Added 15 comprehensive tests in `tests/integrations/microsoft-oauth-retry.test.js`
+  - Commit: 0cc5f3a
 
-- [ ] `[M]` **Paddle webhook retry** - Incomplete
-  - File: `trix-api/src/billing/webhooks/paddle-webhook-handler.js`
-  - getPendingWebhookEvents exists but incomplete
+- [x] `[M]` **Paddle webhook retry** - ✅ FIXED 2026-01-23
+  - Created `trix-api/src/jobs/paddle-webhook-retry-job.js` with scheduled retry job
+  - Runs every 5 minutes to retry failed webhook events (max 5 retries)
+  - Supports distributed locking via Redis for multi-instance deployments
+  - Includes dry-run mode and metrics reporting
+  - Added comprehensive tests (17 test cases)
 
 ### Missing Fallback Strategies
 
