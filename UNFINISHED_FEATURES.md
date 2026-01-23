@@ -5,7 +5,7 @@
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (134/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (135/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
@@ -13,7 +13,7 @@ By Component:
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
-├── Tests           [██░░░░░░░░░░░░░░░░░░] 10%  (18/180)
+├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
 ├── Migrations      [███░░░░░░░░░░░░░░░░░] 17%  (1/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [█████░░░░░░░░░░░░░░░] 31%  (4/13)
@@ -69,9 +69,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Create SegmentRepository class
   - Add cleanup job for old deleted data
 
-- [ ] `[M]` **Credit alert notifications** - Trigger not implemented
+- [x] `[M]` **Credit alert notifications** - ✅ FIXED 2026-01-23
   - File: `src/billing/middleware/credit-guard.js` (line 73)
-  - Low credit detection works but doesn't send notifications
+  - Implemented checkAndTriggerAlerts() to send percentage-based alerts (75%, 90%, 100%)
+  - Commit: b7611c3
 
 ### High Priority
 
@@ -517,7 +518,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 ### trix-api - TODO Tests (45+)
 
 #### CSRF Protection Tests (13 incomplete)
-- [ ] `[M]` CSRF endpoint implementation
+- [x] `[M]` CSRF endpoint implementation - ✅ FIXED 2026-01-23
+  - Endpoint `/v1/auth/csrf` implemented in `src/server.js` (lines 362-365)
+  - Generates CSRF tokens via `reply.generateCsrf()` from @fastify/csrf-protection
+  - All 17 CSRF protection tests pass
+  - Commit: f7011ff (endpoint), b140b3b (tests)
 - [x] `[S]` Token generation tests - ✅ FIXED 2026-01-23 - Created CSRF test server helper
 - [x] `[S]` Request validation tests - ✅ FIXED 2026-01-23 - All 13 todo tests enabled
 - [x] `[S]` File: `tests/security/csrf-protection.test.js` - ✅ FIXED 2026-01-23
