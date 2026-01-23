@@ -1,15 +1,15 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 9 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (156/556 items)
+Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (157/556 items)
 
 By Component:
 ├── trix-api        [████████████████████] 100% (30/30) ✓
-├── trix-cli-go     [█████████░░░░░░░░░░░] 43%  (13/30)
+├── trix-cli-go     [█████████░░░░░░░░░░░] 47%  (14/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
@@ -195,11 +195,13 @@ Estimated Total Effort: ~133 developer-days (15.5 days completed)
 
 ### High Priority
 
-- [ ] `[L]` **Relationship health analytics** - Returns hardcoded data
-  - File: `internal/api/analytics.go` (lines 600-627)
-  - TotalRelationships, OrphanMemories, etc. all return 0
-  - HealthScore hardcoded to 0.75
-  - Requires new API endpoint
+- [x] `[L]` **Relationship health analytics** - ✅ FIXED 2026-01-23
+  - File: `internal/api/analytics.go` (lines 624-760)
+  - Now fetches real relationship data from API endpoints
+  - Calculates health score based on: orphan ratio, average weight, strong/weak ratio
+  - Identifies orphan memories (memories with no relationships)
+  - Provides actionable suggestions for improving graph health
+  - Added 15 comprehensive tests in `internal/api/analytics_test.go`
 
 - [x] `[M]` **Memory insights cluster membership** - ✅ FIXED 2026-01-23
   - File: `internal/api/analytics.go` (line 336)
