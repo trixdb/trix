@@ -1,6 +1,6 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 20 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 21 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
@@ -16,7 +16,7 @@ By Component:
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
 ├── Migrations      [███░░░░░░░░░░░░░░░░░] 17%  (1/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [█████░░░░░░░░░░░░░░░] 31%  (4/13)
+├── Security        [██████░░░░░░░░░░░░░░] 38%  (5/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
 ├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
@@ -62,12 +62,13 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
 
 ### Critical Priority
 
-- [ ] `[L]` **Transcription soft delete refactoring** - Migration done, code changes pending
-  - File: `src/jobs/transcription-job.js` (lines 239-249)
-  - Replace DELETE with UPDATE for soft delete
-  - Add version increment logic
-  - Create SegmentRepository class
-  - Add cleanup job for old deleted data
+- [x] `[L]` **Transcription soft delete refactoring** - ✅ FIXED 2026-01-23
+  - File: `src/jobs/transcription-job.js` uses SegmentRepository for soft delete
+  - SegmentRepository class at `src/lib/repositories/SegmentRepository.js`
+  - Segment cleanup job at `src/jobs/segment-cleanup-job.js`
+  - Tests at `tests/lib/repositories/SegmentRepository.test.js` and `tests/jobs/segment-cleanup-job.test.js`
+  - Version tracking with `transcription_version` column
+  - Soft delete with `deleted_at` timestamp, hard delete after 7-day retention
 
 - [x] `[M]` **Credit alert notifications** - ✅ FIXED 2026-01-23
   - File: `src/billing/middleware/credit-guard.js` (lines 265-277)
@@ -678,7 +679,7 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
 
 ## Security Issues
 
-> **4 Critical issues documented in /issues folder** (1 fixed)
+> **5 Critical issues documented in /issues folder** (4 fixed)
 
 ### Critical Security Issues
 
@@ -690,24 +691,28 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
   - Added comprehensive security tests for information disclosure prevention
   - Commit: e4ab2a0
 
-- [ ] `[L]` **Issue 005: Missing Webhook HMAC Signature Verification**
-  - File: `issues/005-webhook-signature-verification.md`
-  - Location: `src/routes/webhooks-assemblyai.js:17-31`
-  - Problem: Only validates custom header, not HMAC-SHA256 signature
-  - Risk: CWE-347 Webhook Spoofing
+- [x] `[L]` **Issue 005: Missing Webhook HMAC Signature Verification** - FIXED 2026-01-23
+  - File: `src/routes/webhooks-assemblyai.js`
+  - Implemented `verifyWebhookSignature()` with proper HMAC-SHA256 verification (lines 47-75)
+  - Route now uses HMAC signature verification instead of simple header comparison (lines 259-269)
+  - Features: timing-safe comparison, case-insensitive, buffer length protection
+  - Deprecated legacy `verifyWebhookAuth()` function with migration warning
+  - Added 55 comprehensive tests across two test files
 
-- [ ] `[M]` **Issue 006: Transcription Rate Limit Bypass**
-  - File: `issues/006-transcription-rate-limit-bypass.md`
-  - Location: `src/routes/memories/bulk.js`
-  - Problem: Bulk API (20/min) bypasses transcription limit (20/hour)
-  - Risk: CWE-770 DoS/Resource Exhaustion
+- [x] `[M]` **Issue 006: Transcription Rate Limit Bypass** - ✅ FIXED 2026-01-23
+  - File: `src/routes/memories/bulk.js` (lines 35-96)
+  - Created `bulkTranscription` rate limiter in `src/plugins/api-rate-limiter.js`
+  - Bulk API now counts audio/video items against transcription rate limit (20/hour)
+  - Uses `isMediaMimeType()` to detect audio/video MIME types
+  - Pre-consumes quota before processing to prevent race conditions
+  - Added 12 comprehensive tests in `tests/security/bulk-transcription-rate-limit.test.js`
 
-- [ ] `[M]` **Issue 012: Context Expansion Validation Bypass**
-  - File: `issues/012-context-expansion-bypass.md`
-  - Location: `src/routes/audio/clip.js:28, 203-228`
-  - Problem: MIN_CLIP_DURATION check on effective duration, not requested
-  - Attack: 0.1s clip with 60s context → 120.6s clip served
-  - Risk: CWE-636 Policy Bypass
+- [x] `[M]` **Issue 012: Context Expansion Validation Bypass** - ✅ FIXED 2026-01-23
+  - Location: `src/routes/audio/clip.js:242-250`
+  - Fix: Validate original clip duration BEFORE context expansion
+  - Validates `requestedDuration = end - start` against MIN_CLIP_DURATION (0.5s)
+  - Context expansion now only applies AFTER minimum duration check passes
+  - Added 15 comprehensive tests in `tests/routes/audio/clip-duration-bypass.test.js`
 
 - [ ] `[L]` **Issue 015: Buffer Exhaustion in Transcription Download**
   - File: `issues/015-buffer-exhaustion-fix.md`
