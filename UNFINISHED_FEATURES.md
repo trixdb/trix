@@ -369,7 +369,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### Medium Priority - Error Handling
 - [ ] `[M]` Enforce timeouts consistently
-- [ ] `[S]` Validate malformed JSON
+- [x] `[S]` Validate malformed JSON - ✅ FIXED 2026-01-23
+  - Enhanced `safeJsonParse` in `src/lib/json-utils.js` with logging support
+  - Updated `AudioRepository.js` to use `safeJsonParse` for metadata and words fields
 - [ ] `[M]` Add polling fallback
 
 #### Medium Priority - Input Validation
@@ -395,7 +397,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 - [ ] `[M]` Connect summarization services to enrichment system
 - [ ] `[M]` Add periodic jobs for summary regeneration
-- [ ] `[S]` Expose summarization endpoints
+- [x] `[S]` Expose summarization endpoints - FIXED 2026-01-23
+  - Added GET /v1/memories/:id/summary - Get or generate memory summary
+  - Added POST /v1/memories/summarize - Summarize multiple memories together
 - [ ] `[M]` Measure current retrieval performance
 - [ ] `[L]` Update retrieval pipeline to use summaries
 - [ ] `[XL]` Implement GraphRAG approach
@@ -405,7 +409,7 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 - [ ] `[M]` `compare-baseline.ts` - Compare results against baseline
 - [ ] `[M]` `generate-report.ts` - Generate test reports
-- [ ] `[S]` `update-baseline.ts` - Update baseline metrics
+- [x] `[S]` `update-baseline.ts` - Update baseline metrics - FIXED 2026-01-23
 - [ ] `[M]` `validate-scenarios.ts` - Validate scenario definitions
 - [ ] `[L]` Parallel execution support (`executor.ts:251`)
 
