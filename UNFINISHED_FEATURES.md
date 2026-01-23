@@ -660,8 +660,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### MCP Migration
 
-- [ ] `[M]` `startServer()` function - Use TrixMcpServer class
-  - File: `trix-mcp/docs/MIGRATION.md`
+- [x] `[S]` `startServer()` function - Use TrixMcpServer class - FIXED 2026-01-23
+  - File: `trix-mcp/src/index.ts`
+  - Added deprecation warning and @deprecated JSDoc annotation
+  - Migration guide: https://docs.trix.ai/mcp/migration
   - Will be removed in v1.0.0
 
 ---
@@ -1024,9 +1026,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `trix-api/src/integrations/providers/n8n/index.js`
   - No throttling for outbound N8N webhook calls
 
-- [ ] `[M]` **Zapier provider rate limiting** - Not implemented
+- [x] `[M]` **Zapier provider rate limiting** - FIXED 2026-01-23
   - File: `trix-api/src/integrations/providers/zapier/index.js`
-  - No throttling for outbound Zapier calls
+  - Added token bucket rate limiter for outbound webhook calls
+  - Configurable via ZAPIER_RATE_LIMIT_PER_MINUTE env var (default: 60)
+  - Requests exceeding limit are queued and processed when tokens available
 
 ### Missing Retry Logic
 
