@@ -1,26 +1,26 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 22 [S] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 32 [S] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 15% (83/556 items)
+Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (93/556 items)
 
 By Component:
-├── trix-api        [██████████░░░░░░░░░░] 50%  (15/30)
-├── trix-cli-go     [██████░░░░░░░░░░░░░░] 30%  (9/30)
+├── trix-api        [███████████░░░░░░░░░] 57%  (17/30)
+├── trix-cli-go     [████████░░░░░░░░░░░░] 37%  (11/30)
 ├── trix-mcp        [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
-├── trix-research   [███░░░░░░░░░░░░░░░░░] 16%  (36/129)
+├── trix-research   [████░░░░░░░░░░░░░░░░] 20%  (41/129)
 ├── Tests           [░░░░░░░░░░░░░░░░░░░░]  0%  (0/180)
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [░░░░░░░░░░░░░░░░░░░░]  0%  (0/13)
+├── Security        [██░░░░░░░░░░░░░░░░░░]  8%  (1/13)
 ├── Configuration   [████░░░░░░░░░░░░░░░░] 17%  (9/52)
-├── Documentation   [██░░░░░░░░░░░░░░░░░░] 10%  (1/10)
-├── Error Handling  [██████░░░░░░░░░░░░░░] 30%  (3/10)
-├── Accessibility   [██████░░░░░░░░░░░░░░] 29%  (4/14)
+├── Documentation   [████░░░░░░░░░░░░░░░░] 20%  (2/10)
+├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
+├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
 └── Integrations    [██░░░░░░░░░░░░░░░░░░]  8%  (1/13)
 
 Estimated Total Effort: ~133 developer-days (3 days completed)
@@ -204,7 +204,8 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [ ] `[L]` Opt-in telemetry system
 - [ ] `[M]` Error tracking (Sentry integration)
 - [ ] `[M]` Screen reader support
-- [ ] `[S]` Color-blind support
+- [x] `[S]` Color-blind support - ✅ FIXED 2026-01-23
+  - Added --color-blind flag, TRIX_COLOR_BLIND env var, blue/orange palette
 
 ### Future Backlog
 
@@ -309,7 +310,8 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### Low Priority
 - [ ] `[M]` Implement email template versioning
-- [ ] `[S]` Add email preview/dry-run mode
+- [x] `[S]` Add email preview/dry-run mode - ✅ FIXED 2026-01-23
+  - Added dryRun option to email services, logs preview without sending
 - [ ] `[M]` Add email template versioning system
 
 ### Graph Database - Phase 2 & 3 (61 Tasks)
@@ -322,7 +324,8 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### Phase 2A: Additional Security
 - [ ] `[M]` Input validation hardening
-- [ ] `[S]` Relationship type enum validation
+- [x] `[S]` Relationship type enum validation - ✅ FIXED 2026-01-23
+  - Added RELATIONSHIP_TYPES to lib/constants.js, used enum in schema validation
 - [ ] `[M]` Rate limiting
 - [ ] `[L]` Audit logging
 
@@ -425,9 +428,12 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Pending ADRs
 
-- [ ] `[S]` ADR: Forecast Algorithm Selection (credit-usage-forecast-service.md)
-- [ ] `[S]` ADR: Forecast Data Retention Policy (credit-usage-forecast-service.md)
-- [ ] `[S]` ADR: Deep retrieval implementation (deep-retrieval-cost-analysis.md)
+- [x] `[S]` ADR: Forecast Algorithm Selection - ✅ FIXED 2026-01-23
+  - Created ADR-012-forecast-algorithm-selection.md with tiered algorithm approach
+- [x] `[S]` ADR: Forecast Data Retention Policy - ✅ FIXED 2026-01-23
+  - Created ADR-013-forecast-data-retention-policy.md with GDPR-compliant retention
+- [x] `[S]` ADR: Deep retrieval implementation - ✅ FIXED 2026-01-23
+  - Created ADR-014-deep-retrieval-implementation.md with model tiering strategy
 
 ### Paper Ingestion (Low Priority)
 
@@ -677,9 +683,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `src/routes/users.js:115-130`
   - Comment: "needs token blacklist" (though implemented elsewhere)
 
-- [ ] `[S]` **Development insecure encryption key fallback**
+- [x] `[S]` **Development insecure encryption key fallback** - ✅ FIXED 2026-01-23
   - File: `src/integrations/encryption-service.js:40-44`
-  - Falls back to `'dev-only-insecure-key-do-not-use-in-production'`
+  - Added [SECURITY] warning prefix, production already throws error
 
 ---
 
@@ -929,13 +935,13 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Confirmation & Feedback
 
-- [ ] `[S]` **Generic confirmation messages** - trix-cli-admin
+- [x] `[S]` **Generic confirmation messages** - ✅ FIXED 2026-01-23
   - Files: `trix-cli-admin/src/commands/memories.ts`, `clusters.ts`
-  - "Are you sure you want to proceed?" doesn't specify action
+  - Updated 5 prompts to include specific action and resource details
 
-- [ ] `[S]` **Keyboard shortcuts documentation** - Incomplete
+- [x] `[S]` **Keyboard shortcuts documentation** - ✅ FIXED 2026-01-23
   - File: `trix-landing/src/docs/pages/DocsSettings.tsx`
-  - Shortcuts implemented but not fully documented in UI
+  - Documented global, search, and code block shortcuts with sections
 
 ---
 
