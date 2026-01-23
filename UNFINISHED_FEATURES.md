@@ -1,27 +1,27 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 10 [S] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 22 [S] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 13% (71/556 items)
+Overall Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 15% (83/556 items)
 
 By Component:
-├── trix-api        [█████░░░░░░░░░░░░░░░] 27%  (8/30)
+├── trix-api        [██████████░░░░░░░░░░] 50%  (15/30)
 ├── trix-cli-go     [██████░░░░░░░░░░░░░░] 30%  (9/30)
 ├── trix-mcp        [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [███░░░░░░░░░░░░░░░░░] 16%  (36/129)
 ├── Tests           [░░░░░░░░░░░░░░░░░░░░]  0%  (0/180)
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
-├── Deprecated      [█████░░░░░░░░░░░░░░░] 27%  (4/15)
+├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [░░░░░░░░░░░░░░░░░░░░]  0%  (0/13)
-├── Configuration   [███░░░░░░░░░░░░░░░░░] 13%  (7/52)
+├── Configuration   [████░░░░░░░░░░░░░░░░] 17%  (9/52)
 ├── Documentation   [██░░░░░░░░░░░░░░░░░░] 10%  (1/10)
-├── Error Handling  [░░░░░░░░░░░░░░░░░░░░]  0%  (0/10)
-├── Accessibility   [████░░░░░░░░░░░░░░░░] 14%  (2/14)
-└── Integrations    [░░░░░░░░░░░░░░░░░░░░]  0%  (0/13)
+├── Error Handling  [██████░░░░░░░░░░░░░░] 30%  (3/10)
+├── Accessibility   [██████░░░░░░░░░░░░░░] 29%  (4/14)
+└── Integrations    [██░░░░░░░░░░░░░░░░░░]  8%  (1/13)
 
 Estimated Total Effort: ~133 developer-days (3 days completed)
 ```
@@ -108,13 +108,13 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `src/services/SessionService.js` (lines 456-457)
   - Trigger consolidation and apply retention policy
 
-- [ ] `[S]` **Session space filtering** - TODO in code
+- [x] `[S]` **Session space filtering** - ✅ FIXED 2026-01-23
   - File: `src/services/SessionService.js` (line 288)
-  - Filter sessions by accessible spaces
+  - Added `_getAccessibleSpaceIds()` helper and space filtering in `listSessions()`
 
-- [ ] `[S]` **CLI session space permission check** - TODO in code
+- [x] `[S]` **CLI session space permission check** - ✅ FIXED 2026-01-23
   - File: `src/routes/cli-sessions.js` (line 102)
-  - Space permissions not validated
+  - Added space permission validation when creating sessions with space_id
 
 ### Low Priority
 
@@ -571,11 +571,13 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Deprecated Functions (11+)
 
-- [ ] `[S]` `createOrphanedFilesCleanupJob()` - Use createFindOrphanedS3Job instead
+- [x] `[S]` `createOrphanedFilesCleanupJob()` - ✅ DEPRECATED 2026-01-23
   - File: `src/jobs/cleanup-job.js:333`
+  - Added runtime deprecation warning; use createFindOrphanedS3Job instead
 
-- [ ] `[S]` `createTranscriptionJob()` - Use job queue's enqueue method
+- [x] `[S]` `createTranscriptionJob()` - ✅ DEPRECATED 2026-01-23
   - File: `src/jobs/transcription-job.js:470`
+  - Added runtime deprecation warning; use job queue's enqueue method
 
 - [x] `[XS]` `generateAudioKey()` - Use generateRawKey() - ✅ ALREADY REMOVED
   - File: `src/plugins/s3.js` - Function no longer exists
@@ -586,17 +588,21 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [x] `[XS]` `createTimeoutSignal()` - Use fetchWithTimeout() - ✅ FIXED 2026-01-23
   - File: `src/lib/embeddings.js` - Function removed (was unused)
 
-- [ ] `[S]` `verifyWebhookAuth()` - Use verifyWebhookSignature for HMAC-SHA256
+- [x] `[S]` `verifyWebhookAuth()` - ✅ DEPRECATED 2026-01-23
   - File: `src/routes/webhooks-assemblyai.js:12`
+  - Added runtime deprecation warning; use verifyWebhookSignature for HMAC-SHA256
 
-- [ ] `[S]` `_getGraphScore()` - Use _getGraphScoreBatch to avoid N+1
+- [x] `[S]` `_getGraphScore()` - ✅ DEPRECATED 2026-01-23
   - File: `src/lib/graph/services/HybridScorer.js:174`
+  - Added runtime deprecation warning; use _getGraphScoreBatch to avoid N+1
 
-- [ ] `[S]` `getDefaultTranscriptionProvider()` - Use getTranscriptionFailover()
+- [x] `[S]` `getDefaultTranscriptionProvider()` - ✅ DEPRECATED 2026-01-23
   - File: `src/lib/audio/providers/index.js:62`
+  - Added runtime deprecation warning; use getTranscriptionFailover()
 
-- [ ] `[S]` `getDefaultVisionProvider()` - Use getVisionFailover()
+- [x] `[S]` `getDefaultVisionProvider()` - ✅ DEPRECATED 2026-01-23
   - File: `src/lib/images/providers/index.js:35`
+  - Added runtime deprecation warning; use getVisionFailover()
 
 ### Deprecated API Routes
 
@@ -696,9 +702,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Visual search requires external service
   - No docker-compose setup
 
-- [ ] `[S]` **Health checks** - Use wget but package not in Alpine
-  - File: `trix-workers-node/.env.docker.example`
-  - Should use Node.js health check
+- [x] `[S]` **Health checks** - ✅ FIXED 2026-01-23
+  - Files: `trix-workers-node/Dockerfile`, `docker-compose.yml`
+  - Replaced wget with Node.js HTTP health check
 
 - [ ] `[M]` **Password validation** - Placeholder not enforced
   - `POSTGRES_PASSWORD=CHANGE_ME_TO_STRONG_PASSWORD_MIN_12_CHARS`
@@ -720,7 +726,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 ### Logging Configuration
 
 - [ ] `[L]` **No log aggregation** - Logs to files/stdout only
-- [ ] `[S]` **No log level validation** - Invalid values not caught
+- [x] `[S]` **No log level validation** - ✅ FIXED 2026-01-23
+  - Added validation in trix-api/src/lib/logger.js and trix-workers-node/src/lib/logger.js
+  - Invalid log levels now warn and default to 'info'
 - [ ] `[M]` **No log rotation policy** - Retention not specified
 - [ ] `[M]` **Structured logging inconsistent** - Some JSON, some pino
 
@@ -824,17 +832,17 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Silent Error Swallowing
 
-- [ ] `[S]` **S3 backup status recording** - Silently ignores DB errors
+- [x] `[S]` **S3 backup status recording** - ✅ FIXED 2026-01-23
   - File: `trix-api/src/lib/pipeline/s3-backup-service.js` (lines 90-92)
-  - Database errors during error handling are swallowed
+  - Added error logging while preserving graceful degradation
 
-- [ ] `[S]` **Cache service errors** - Silently returns null
+- [x] `[S]` **Cache service errors** - ✅ FIXED 2026-01-23
   - File: `trix-api/src/lib/cache/cache-service.js` (lines 436-438)
-  - Fire-and-forget error handling with no logging
+  - Added logger option and warning logs for cache failures
 
-- [ ] `[S]` **Feedback table check** - Assumes table doesn't exist
+- [x] `[S]` **Feedback table check** - ✅ FIXED 2026-01-23
   - File: `trix-api/src/routes/feedback.js` (lines 228-230)
-  - No logging when table check fails
+  - Added warning log when table check fails
 
 ### Unhandled Promise Rejections
 
@@ -907,13 +915,13 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `trix-landing/src/docs/components/DocsSearch.tsx`
   - Result navigation uses onClick only
 
-- [ ] `[S]` **Missing ARIA roles** - APIComponents tabs
+- [x] `[S]` **Missing ARIA roles** - APIComponents tabs - ✅ FIXED 2026-01-23
   - File: `trix-landing/src/docs/components/APIComponents.tsx`
-  - Tabs lack `role="tab"` attributes
+  - Added role="tablist", role="tab", aria-selected, aria-controls, role="tabpanel"
 
-- [ ] `[S]` **Missing ARIA roles** - DocsSidebar regions
+- [x] `[S]` **Missing ARIA roles** - DocsSidebar regions - ✅ FIXED 2026-01-23
   - File: `trix-landing/src/docs/components/DocsSidebar.tsx`
-  - Collapsible sections missing `role="region"`
+  - Added role="region", aria-controls, aria-label for collapsible sections
 
 ### Confirmation & Feedback
 
@@ -941,9 +949,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `trix-api/src/integrations/providers/microsoft/index.js` (line 26)
   - v1.0 hardcoded
 
-- [ ] `[S]` **Notion API version** - Not configurable
-  - File: `trix-api/src/integrations/providers/notion/index.js` (lines 130-131)
-  - v1 hardcoded in OAuth URLs
+- [x] `[S]` **Notion API version** - ✅ FIXED 2026-01-23
+  - File: `trix-api/src/integrations/providers/notion/index.js`
+  - Made configurable via NOTION_OAUTH_API_VERSION env var (default: v1)
 
 ### Missing Rate Limiting (Outbound)
 
