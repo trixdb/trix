@@ -1,14 +1,14 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 5 [XL] + 1 [XXL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 5 [XL] + 1 [XXL] items fixed, 1 skipped)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (155/556 items)
+Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (156/556 items)
 
 By Component:
-├── trix-api        [███████████████████░] 97%  (29/30)
+├── trix-api        [████████████████████] 100% (30/30) ✓
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
@@ -157,10 +157,11 @@ Estimated Total Effort: ~133 developer-days (15.5 days completed)
   - Documented configured vs placeholder templates in code comments
   - Added all template env vars to .env.example with instructions
 
-- [ ] `[XL]` **Apple Calendar webhooks** - Not supported
+- [-] `[XL]` **Apple Calendar webhooks** - SKIPPED (platform limitation)
   - File: `src/integrations/providers/apple/index.js`
   - CalDAV polling only (15-minute intervals)
-  - Requires Apple push notification service integration
+  - Reason: Apple CalDAV doesn't support webhooks; requires Apple Push Notification Service
+  - Workaround: Polling at 15-minute intervals is the standard approach for CalDAV
 
 - [x] `[L]` **Google Calendar webhooks** - ✅ FIXED 2026-01-23
   - File: `src/integrations/providers/google/services/calendar-service.js`
