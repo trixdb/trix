@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 11 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 12 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (131/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (132/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
@@ -14,7 +14,7 @@ By Component:
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 10%  (18/180)
-├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
+├── Migrations      [███░░░░░░░░░░░░░░░░░] 17%  (1/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [████░░░░░░░░░░░░░░░░] 15%  (2/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 25%  (13/52)
@@ -227,9 +227,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Critical Priority
 
-- [ ] `[M]` **Private IP validation** - Security gap
-  - File: `tests/unit/security/security-hardening.test.ts` (lines 261-265)
-  - Private IPs (192.168.x.x, 10.0.0.x, 172.16.x.x) should be blocked
+- [x] `[M]` **Private IP validation** - FIXED 2026-01-23
+  - File: `src/security/index.ts` (isPrivateIp function, lines 167-219)
+  - Blocks 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8 (non-localhost), 169.254.0.0/16
+  - validateApiUrl() uses isPrivateIp() for SSRF protection (line 134)
+  - All 102 security tests pass including private IP rejection tests
 
 - [x] `[M]` **Health endpoints integration** - FIXED 2026-01-23
   - Integrated `/health/liveness`, `/health/readiness`, `/health` endpoints into HTTP server
@@ -360,7 +362,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [ ] `[L]` Replace N+1 INSERT queries with batch operations (segments, entities, chapters)
 - [x] `[S]` Add JSONB index for webhook lookups - ✅ FIXED 2026-01-23
 - [x] `[XS]` Fix division by zero in confidence calculation - ✅ FIXED 2026-01-23
-- [ ] `[M]` Add buffer size limits for S3 downloads (100MB max)
+- [x] `[M]` Add buffer size limits for S3 downloads (100MB max) - ✅ FIXED 2026-01-23
+  - Added pre-download size check via S3 HEAD request (CWE-770 prevention)
+  - Rejects files >100MB before streaming begins
+  - Defense-in-depth: streaming check still enforces limit for metadata mismatches
 - [x] `[S]` Fix circular reference handling in JSON.stringify - ✅ FIXED 2026-01-23
   - Created shared `safeJsonStringify` utility in `src/lib/json-utils.js`
   - Updated transcription-job.js and transcription-processor.js to use it
@@ -574,10 +579,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Medium - Incomplete Features
 
-- [ ] `[M]` **Sessions Full-Text Search** - Index commented out
-  - File: `migrations/20260107000000_cli_sessions.js` (lines 119-123)
-  - Issue: Template literal issues with || operator
-  - TODO: Re-enable with proper escaping or generated column approach
+- [x] `[M]` **Sessions Full-Text Search** - FIXED 2026-01-23
+  - Created `migrations/20260123150000_sessions_full_text_search.js`
+  - Added `search_vector` generated column with STORED tsvector
+  - Uses setweight for name (A) and description (B) fields
+  - GIN index with partial filter on archived_at IS NULL
 
 ---
 
@@ -900,9 +906,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Location: `trix-cli-go/cmd/*.go`
   - Rich CLIError struct exists but not used consistently
 
-- [ ] `[M]` **Error code documentation** - Not documented
-  - Files: `trix-api/src/routes/temporal-relationships.js`, `auth.js`
-  - HTTP status codes used without documented meanings
+- [x] `[M]` **Error code documentation** - ✅ FIXED 2026-01-23
+  - Files: `trix-api/src/lib/utils/errors.js`
+  - Added comprehensive HTTP status code reference with usage guidelines
+  - Documented all error classes with examples and use cases
+  - Added new error classes: MethodNotAllowedError, LockedError, RateLimitError
 
 ### Panic/Fatal Improvements
 
