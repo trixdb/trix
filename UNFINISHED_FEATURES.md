@@ -1,29 +1,29 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 5 [S] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 12% (64/556 items)
+Overall Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 12% (69/556 items)
 
 By Component:
 ├── trix-api        [█████░░░░░░░░░░░░░░░] 27%  (8/30)
-├── trix-cli-go     [█████░░░░░░░░░░░░░░░] 23%  (7/30)
+├── trix-cli-go     [██████░░░░░░░░░░░░░░] 30%  (9/30)
 ├── trix-mcp        [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
-├── trix-research   [███░░░░░░░░░░░░░░░░░] 13%  (33/129)
+├── trix-research   [███░░░░░░░░░░░░░░░░░] 14%  (34/129)
 ├── Tests           [░░░░░░░░░░░░░░░░░░░░]  0%  (0/180)
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
-├── Deprecated      [████░░░░░░░░░░░░░░░░] 20%  (3/15)
+├── Deprecated      [█████░░░░░░░░░░░░░░░] 27%  (4/15)
 ├── Security        [░░░░░░░░░░░░░░░░░░░░]  0%  (0/13)
 ├── Configuration   [███░░░░░░░░░░░░░░░░░] 13%  (7/52)
 ├── Documentation   [██░░░░░░░░░░░░░░░░░░] 10%  (1/10)
 ├── Error Handling  [░░░░░░░░░░░░░░░░░░░░]  0%  (0/10)
-├── Accessibility   [░░░░░░░░░░░░░░░░░░░░]  0%  (0/14)
+├── Accessibility   [████░░░░░░░░░░░░░░░░] 14%  (2/14)
 └── Integrations    [░░░░░░░░░░░░░░░░░░░░]  0%  (0/13)
 
-Estimated Total Effort: ~134 developer-days (2 days completed)
+Estimated Total Effort: ~133 developer-days (3 days completed)
 ```
 
 ### Effort Legend
@@ -181,8 +181,8 @@ Estimated Total Effort: ~134 developer-days (2 days completed)
 - [ ] `[M]` Refactor daemon.go (1,171 lines)
 - [ ] `[L]` Implement API Client Interface for mocking
 - [ ] `[XL]` Add Command Package Tests (13.1% → 40% coverage)
-- [ ] `[S]` Fix panic usage in jq.go
-- [ ] `[S]` Fix panic usage in account_members.go
+- [x] `[S]` Fix panic usage in jq.go - ✅ FIXED 2026-01-23
+- [x] `[S]` Fix panic usage in account_members.go - ✅ FIXED 2026-01-23
 - [ ] `[M]` Add dependency vulnerability scanning
 
 ### Sprint 4: Performance & Features
@@ -342,7 +342,7 @@ Estimated Total Effort: ~134 developer-days (2 days completed)
 
 #### Critical (Must Fix)
 - [ ] `[L]` Replace N+1 INSERT queries with batch operations (segments, entities, chapters)
-- [ ] `[S]` Add JSONB index for webhook lookups
+- [x] `[S]` Add JSONB index for webhook lookups - ✅ FIXED 2026-01-23
 - [x] `[XS]` Fix division by zero in confidence calculation - ✅ FIXED 2026-01-23
 - [ ] `[M]` Add buffer size limits for S3 downloads (100MB max)
 - [ ] `[S]` Fix circular reference handling in JSON.stringify
@@ -877,7 +877,7 @@ Estimated Total Effort: ~134 developer-days (2 days completed)
   - File: `trix-cli-admin/README.md`
   - No inline CLI help using Commander.js
 
-- [ ] `[S]` **Daemon logs/doctor help** - Minimal help text
+- [x] `[S]` **Daemon logs/doctor help** - ✅ FIXED 2026-01-23 - Enhanced help text with examples
   - Files: `trix-daemon/cmd/trixd/logs.go`, `doctor.go`
 
 ### Web Component Accessibility
