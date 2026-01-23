@@ -1,14 +1,14 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 22 [M] + 1 [L] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 3 [L] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (141/556 items)
+Overall Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 27% (147/556 items)
 
 By Component:
-├── trix-api        [██████████████░░░░░░] 70%  (21/30)
+├── trix-api        [███████████████░░░░░] 73%  (22/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
@@ -16,14 +16,14 @@ By Component:
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
 ├── Migrations      [██████░░░░░░░░░░░░░░] 33%  (2/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [███████░░░░░░░░░░░░░] 46%  (6/13)
+├── Security        [████████████░░░░░░░░] 62%  (8/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
 ├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
 └── Integrations    [███░░░░░░░░░░░░░░░░░] 23%  (3/13)
 
-Estimated Total Effort: ~133 developer-days (3.8 days completed)
+Estimated Total Effort: ~133 developer-days (5.2 days completed)
 ```
 
 ### Effort Legend
@@ -679,7 +679,7 @@ Estimated Total Effort: ~133 developer-days (3.8 days completed)
 
 ## Security Issues
 
-> **5 Critical issues documented in /issues folder** (4 fixed)
+> **5 Critical issues documented in /issues folder** (4 of 5 fixed)
 
 ### Critical Security Issues
 
