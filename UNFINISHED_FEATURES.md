@@ -1,6 +1,6 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 5 [S] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 8 [S] items fixed)
 
 ## Progress Overview
 
@@ -851,15 +851,17 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Panic/Fatal Improvements
 
-- [ ] `[S]` **Panic with context** - ai_cli_process_session.go
+- [x] `[S]` **Panic with context** - ai_cli_process_session.go - ✅ Already has context
   - File: `trix-cli-go/cmd/ai_cli_process_session.go` (lines 74, 78)
-  - Panic messages could include more context
+  - Panic messages already include full context: `panic(fmt.Sprintf("failed to mark 'X' flag as required: %v", err))`
 
-- [ ] `[S]` **Panic with context** - auth.go
-  - File: `trix-cli-go/cmd/auth.go` (line 100)
+- [x] `[S]` **Panic with context** - auth.go - ✅ Already has context
+  - File: `trix-cli-go/cmd/auth.go` (lines 101, 107)
+  - Panic messages already include full context: `panic(fmt.Sprintf("failed to mark 'X' flag as required: %v", err))`
 
-- [ ] `[S]` **Panic with context** - jq.go
+- [x] `[S]` **Panic with context** - jq.go - ✅ FIXED (commit f48063d)
   - File: `trix-cli-go/internal/jq/jq.go`
+  - Panics replaced with proper error handling
 
 ---
 
