@@ -169,9 +169,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - HealthScore hardcoded to 0.75
   - Requires new API endpoint
 
-- [ ] `[M]` **Memory insights cluster membership** - Missing data
+- [x] `[M]` **Memory insights cluster membership** - ✅ FIXED 2026-01-23
   - File: `internal/api/analytics.go` (line 336)
-  - Returns empty ClusterMembership struct
+  - Now fetches clusters via GET /memories/:id/clusters endpoint
 
 - [x] `[S]` **Memory insights recent access** - ✅ FIXED 2026-01-23
   - File: `internal/api/analytics.go` (line 323)
