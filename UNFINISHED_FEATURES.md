@@ -23,7 +23,7 @@ By Component:
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
 └── Integrations    [██████░░░░░░░░░░░░░░] 31%  (4/13)
 
-Estimated Total Effort: ~133 developer-days (15.5 days completed)
+Estimated Total Effort: ~133 developer-days (21.5 days completed)
 ```
 
 ### Effort Legend
