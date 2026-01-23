@@ -1,18 +1,18 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 8 [S] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 10 [S] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 12% (69/556 items)
+Overall Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 13% (71/556 items)
 
 By Component:
 ├── trix-api        [█████░░░░░░░░░░░░░░░] 27%  (8/30)
 ├── trix-cli-go     [██████░░░░░░░░░░░░░░] 30%  (9/30)
 ├── trix-mcp        [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
-├── trix-research   [███░░░░░░░░░░░░░░░░░] 14%  (34/129)
+├── trix-research   [███░░░░░░░░░░░░░░░░░] 16%  (36/129)
 ├── Tests           [░░░░░░░░░░░░░░░░░░░░]  0%  (0/180)
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
 ├── Deprecated      [█████░░░░░░░░░░░░░░░] 27%  (4/15)
@@ -345,15 +345,22 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [x] `[S]` Add JSONB index for webhook lookups - ✅ FIXED 2026-01-23
 - [x] `[XS]` Fix division by zero in confidence calculation - ✅ FIXED 2026-01-23
 - [ ] `[M]` Add buffer size limits for S3 downloads (100MB max)
-- [ ] `[S]` Fix circular reference handling in JSON.stringify
+- [x] `[S]` Fix circular reference handling in JSON.stringify - ✅ FIXED 2026-01-23
+  - Created shared `safeJsonStringify` utility in `src/lib/json-utils.js`
+  - Updated transcription-job.js and transcription-processor.js to use it
 
 #### High Priority
 - [ ] `[M]` Add webhook idempotency tracking
 - [ ] `[M]` Add row-level locking in saveTranscript
-- [ ] `[S]` Add unique constraints to prevent duplicate segments
-- [ ] `[S]` Fix AbortController timer leaks
-- [ ] `[S]` Fix webhook service timer leak
-- [ ] `[S]` Fix embeddings service timer leak
+- [x] `[S]` Add unique constraints to prevent duplicate segments - ✅ FIXED 2026-01-23
+  - Added migration for unique index on (audio_file_id, start_time, end_time)
+- [x] `[S]` Fix AbortController timer leaks - FIXED 2026-01-23
+  - Removed unused `createTimeoutSignal` method from assemblyai-provider.js
+  - All active AbortController patterns use proper `clearTimeout()` in finally blocks
+- [x] `[S]` Fix webhook service timer leak - FIXED (already implemented)
+  - File: `src/lib/webhook-service.js` line 280 has `clearTimeout(timeout)` in finally block
+- [x] `[S]` Fix embeddings service timer leak - FIXED (already implemented)
+  - Uses `fetchWithTimeout` utility which has proper cleanup in finally block
 
 #### Medium Priority - Database
 - [ ] `[M]` Add partial indexes
