@@ -1,16 +1,16 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 1 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 22% (120/556 items)
+Overall Progress: [█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 22% (121/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
-├── trix-mcp        [████████░░░░░░░░░░░░] 40%  (4/10)
+├── trix-mcp        [██████████░░░░░░░░░░] 50%  (5/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 10%  (18/180)
@@ -228,9 +228,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `tests/unit/security/security-hardening.test.ts` (lines 261-265)
   - Private IPs (192.168.x.x, 10.0.0.x, 172.16.x.x) should be blocked
 
-- [ ] `[M]` **Health endpoints integration** - Code ready, not integrated
-  - Documentation: `monitoring/INTEGRATION.md`
-  - `/health/liveness`, `/health/readiness`, `/health` endpoints needed
+- [x] `[M]` **Health endpoints integration** - FIXED 2026-01-23
+  - Integrated `/health/liveness`, `/health/readiness`, `/health` endpoints into HTTP server
+  - Uses health check helpers from `src/observability/health.ts`
 
 ### High Priority
 
