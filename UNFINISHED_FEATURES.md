@@ -267,9 +267,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Low Priority
 
-- [ ] `[M]` **Resources capability** - Not fully implemented
+- [x] `[S]` **Resources capability** - ✅ FIXED 2026-01-23
   - File: `tests/e2e/mcp-protocol.test.ts` (lines 188, 548)
-  - resources/list handling skipped
+  - resources/list handling implemented and tested
+  - Resources capability was already declared and handlers registered; tests were just skipped
 
 - [x] `[S]` **Redis connection error handling test** - ✅ FIXED 2026-01-23
   - File: `tests/unit/storage/RedisSessionStore.test.ts` (line 346)
@@ -806,8 +807,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Default Values Needing Configuration
 
-- [ ] `[M]` **Database pool sizing** - Hard-coded, no guidance
-  - `DB_POOL_MIN=2`, `DB_POOL_MAX=20`
+- [x] `[M]` **Database pool sizing** - ✅ DOCUMENTED 2026-01-23
+  - Added comprehensive pool sizing guidance to postgres.js plugin comments
+  - Enhanced .env.example with sizing by CPU cores and workload type
+  - Created docs/deployment/database.md with detailed tuning guide
+  - Includes multi-instance deployment calculations and cloud platform recommendations
 
 - [ ] `[L]` **Worker concurrency** - Not auto-tuned
   - All hardcoded values, should scale with CPU/memory
@@ -858,9 +862,9 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `trix-api/docs/api/clusters.md` (not created)
   - Referenced in README.md line 865
 
-- [ ] `[M]` **Testing Guide** - Coming soon
-  - File: `trix-api/docs/development/testing.md` (not created)
-  - Referenced in README.md line 877
+- [x] `[M]` **Testing Guide** - COMPLETED 2026-01-23
+  - File: `trix-api/docs/development/testing.md` (created)
+  - Covers: test organization, running tests, writing tests, fixtures, mocking, database setup, coverage, CI
 
 - [ ] `[M]` **Microsoft OAuth documentation** - Coming soon
   - File: `trix-api/docs/api/authentication.md` line 271
@@ -1038,9 +1042,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Missing Retry Logic
 
-- [ ] `[M]` **Google OAuth token refresh retry** - No exponential backoff
-  - File: `trix-api/src/integrations/providers/google/services/oauth-service.js` (lines 33-99)
-  - Transient errors cause immediate failure
+- [x] `[M]` **Google OAuth token refresh retry** - FIXED 2026-01-23
+  - File: `trix-api/src/integrations/providers/google/services/oauth-service.js`
+  - Added exponential backoff retry (1s, 2s, 4s) for transient errors (5xx, network, timeouts)
+  - Configurable via GOOGLE_OAUTH_RETRY_COUNT env var (default: 3)
+  - Logs retry attempts at debug level
 
 - [ ] `[M]` **Microsoft OAuth token refresh retry** - No retry
   - File: `trix-api/src/integrations/providers/microsoft/index.js`
