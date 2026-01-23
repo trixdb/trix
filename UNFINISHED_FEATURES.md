@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 14 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 16 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (133/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 24% (134/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
@@ -16,7 +16,7 @@ By Component:
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 10%  (18/180)
 ├── Migrations      [███░░░░░░░░░░░░░░░░░] 17%  (1/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
-├── Security        [████░░░░░░░░░░░░░░░░] 23%  (3/13)
+├── Security        [█████░░░░░░░░░░░░░░░] 31%  (4/13)
 ├── Configuration   [█████░░░░░░░░░░░░░░░] 27%  (14/52)
 ├── Documentation   [████░░░░░░░░░░░░░░░░] 20%  (2/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
@@ -671,15 +671,17 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ## Security Issues
 
-> **5 Critical issues documented in /issues folder**
+> **4 Critical issues documented in /issues folder** (1 fixed)
 
 ### Critical Security Issues
 
-- [ ] `[M]` **Issue 004: Authorization Information Disclosure**
-  - File: `issues/004-authorization-info-leak.md`
-  - Location: `src/routes/audio/clip.js:214-216`
-  - Problem: Auth checked AFTER file metadata fetch, allows existence inference
-  - Risk: CWE-200 Information Disclosure
+- [x] `[M]` **Issue 004: Authorization Information Disclosure** - ✅ FIXED 2026-01-17
+  - Added `getAudioFileInfoWithAuth()` method to check authorization WITH file fetch
+  - Returns consistent 404 error for both "not found" and "not authorized" cases
+  - Prevents timing analysis attacks by checking authorization in same operation
+  - Updated both `/audio/:id/clip` and `/audio/:id/clip/info` endpoints
+  - Added comprehensive security tests for information disclosure prevention
+  - Commit: e4ab2a0
 
 - [ ] `[L]` **Issue 005: Missing Webhook HMAC Signature Verification**
   - File: `issues/005-webhook-signature-verification.md`
