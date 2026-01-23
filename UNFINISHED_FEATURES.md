@@ -599,8 +599,8 @@ Estimated Total Effort: ~134 developer-days (2 days completed)
 
 ### CLI Deprecated Flags
 
-- [ ] `[S]` `--limit` and `--offset` - Use `--page` and `--per-page`
-  - File: `trix-cli-go/internal/pagination/pagination.go:51-62`
+- [x] `[S]` `--limit` and `--offset` - Use `--page` and `--per-page` - ✅ FIXED 2026-01-23
+  - File: `trix-cli-go/internal/pagination/pagination.go:31-36 - Added MarkDeprecated() calls`
 
 - [x] `[XS]` `--debug` - Use `-vv` for verbosity - ✅ FIXED 2026-01-23
   - File: `trix-cli-go/cmd/root.go` - Added MarkDeprecated("debug", "use -vv...")
