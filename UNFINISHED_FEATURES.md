@@ -1,18 +1,18 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 34 [S] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 35 [S] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (96/556 items)
+Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (97/556 items)
 
 By Component:
 ├── trix-api        [███████████░░░░░░░░░] 57%  (17/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 37%  (11/30)
 ├── trix-mcp        [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
-├── trix-research   [████░░░░░░░░░░░░░░░░] 20%  (41/129)
+├── trix-research   [████░░░░░░░░░░░░░░░░] 21%  (42/129)
 ├── Tests           [░░░░░░░░░░░░░░░░░░░░]  0%  (0/180)
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
@@ -368,7 +368,13 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### Medium Priority - Database
 - [ ] `[M]` Add partial indexes
-- [ ] `[S]` Convert to JSONB where appropriate
+- [x] `[S]` Convert to JSONB where appropriate - ✅ Already complete
+  - All JSON columns in audio/transcription tables are already JSONB
+  - audio_files: metadata, content_safety_labels, entities, auto_chapters, provider_metadata
+  - audio_segments: words
+  - audio_entities: metadata
+  - video_files: metadata, provider_metadata, video_metadata, detected_objects, facts, labels
+  - JSONB indexes already exist for webhook lookups (provider_metadata->>'assemblyai_transcript_id')
 - [ ] `[M]` Add content deduplication caching
 
 #### Medium Priority - Error Handling
