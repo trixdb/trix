@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 32 [S] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 33 [S] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (93/556 items)
+Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (94/556 items)
 
 By Component:
 ├── trix-api        [███████████░░░░░░░░░] 57%  (17/30)
@@ -17,7 +17,7 @@ By Component:
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [██░░░░░░░░░░░░░░░░░░]  8%  (1/13)
-├── Configuration   [████░░░░░░░░░░░░░░░░] 17%  (9/52)
+├── Configuration   [████░░░░░░░░░░░░░░░░] 19%  (10/52)
 ├── Documentation   [████░░░░░░░░░░░░░░░░] 20%  (2/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
@@ -100,9 +100,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - Used in `src/routes/memories/handlers/content-handlers.js`
   - Used in `src/lib/ingestion/ingestion-service.js`
 
-- [ ] `[S]` **Batch resource fetching** - TODO in code
-  - File: `src/services/MemoryService.js` (line 442)
-  - Implement when ResourceService is integrated
+- [x] `[S]` **Batch resource fetching** - ✅ FIXED 2026-01-23
+  - Added `getResourcesBatch()` to ResourceRepository
+  - Injected ResourceRepository into MemoryService
+  - Updated `_enrichMemoriesBatch()` to use batch fetching
 
 - [ ] `[M]` **Session consolidation job** - TODO in code
   - File: `src/services/SessionService.js` (lines 456-457)
@@ -679,9 +680,11 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
   - File: `src/plugins/helmet.js:34`
   - Issue: `styleSrc: ["'self'", 'https:', "'unsafe-inline'"]`
 
-- [ ] `[S]` **Password change token invalidation incomplete**
-  - File: `src/routes/users.js:115-130`
-  - Comment: "needs token blacklist" (though implemented elsewhere)
+- [x] `[S]` **Password change token invalidation incomplete** - FIXED 2026-01-23
+  - File: `src/routes/users.js:115-130` and `src/routes/auth.js`
+  - Token invalidation was already implemented in users.js; updated outdated comment
+  - Added missing token invalidation to /reset-password endpoint in auth.js
+  - Both password change and password reset now invalidate all user tokens
 
 - [x] `[S]` **Development insecure encryption key fallback** - ✅ FIXED 2026-01-23
   - File: `src/integrations/encryption-service.js:40-44`
@@ -693,9 +696,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Environment Variables - Undocumented
 
-- [ ] `[S]` **SigLIP endpoints** - Documented but no docker setup
+- [x] `[S]` **SigLIP endpoints** - ✅ DOCUMENTED 2026-01-23
   - `SIGLIP_ENDPOINT`, `SIGLIP_TEXT_ENDPOINT`
-  - Requires self-hosted inference server not in docker-compose
+  - Setup guide: [trix-visual-embeddings/README.md](./trix-visual-embeddings/README.md)
+  - Docker: `docker compose --profile visual up` (trix-api) or standalone in trix-visual-embeddings/
 
 - [x] `[XS]` **Graph DB config** - ✅ FIXED 2026-01-23
   - `GRAPH_DB_TYPE`, `MEMGRAPH_HOST`, `MEMGRAPH_PORT` - Added to .env.example
@@ -708,9 +712,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 ### Docker/Container Setup
 
-- [ ] `[XL]` **SigLIP container** - Not provided
-  - Visual search requires external service
-  - No docker-compose setup
+- [x] `[XL]` **SigLIP container** - ✅ PROVIDED 2026-01-23
+  - Visual embeddings service in `trix-visual-embeddings/` directory
+  - Docker: `docker compose --profile visual up` or standalone `docker compose up` in trix-visual-embeddings/
+  - See: [trix-visual-embeddings/README.md](./trix-visual-embeddings/README.md)
 
 - [x] `[S]` **Health checks** - ✅ FIXED 2026-01-23
   - Files: `trix-workers-node/Dockerfile`, `docker-compose.yml`
@@ -747,7 +752,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [ ] `[M]` **Pre-deployment validation** - Not automated
   - `scripts/validate-config.js` exists but not in CI/CD
 
-- [ ] `[S]` **Migration validation** - Not enforced in releases
+- [x] `[S]` **Migration validation** - ✅ FIXED 2026-01-23
+  - Added validate-migrations.yml workflow to CI pipeline
+  - Deploy and release workflows now require migration validation
+  - Validates: file syntax, up/down on test DB, rollback, idempotency, naming conventions
 
 ### Feature Flags Cleanup
 
@@ -775,8 +783,10 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 - [ ] `[M]` **Railway migration drift** - Manual resolution needed
   - Mentioned in CLAUDE.md but not automated
 
-- [ ] `[S]` **Production readiness checklist** - Incomplete
-  - `.env.docker.example` has partial checklist
+- [x] `[S]` **Production readiness checklist** - FIXED 2026-01-23
+  - Created `/PRODUCTION_CHECKLIST.md` with comprehensive 15-section checklist
+  - Covers: environment variables, database security, API keys, rate limits,
+    SSL/TLS, logging, health checks, backups, monitoring, security hardening
 
 - [ ] `[L]` **Kubernetes ConfigMap/Secret templates** - Not created
   - No templates for trix-api or trix-workers
