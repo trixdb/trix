@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 18 [M] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 19 [M] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (137/556 items)
+Overall Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (138/556 items)
 
 By Component:
 ├── trix-api        [██████████████░░░░░░] 70%  (21/30)
@@ -21,7 +21,7 @@ By Component:
 ├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
-└── Integrations    [███░░░░░░░░░░░░░░░░░] 15%  (2/13)
+└── Integrations    [███░░░░░░░░░░░░░░░░░] 23%  (3/13)
 
 Estimated Total Effort: ~133 developer-days (3.5 days completed)
 ```
@@ -1087,9 +1087,15 @@ Estimated Total Effort: ~133 developer-days (3.5 days completed)
   - Files: `trix-api/src/integrations/lib/circuit-breaker.js`, `circuit-breaker-registry.js`
   - When circuit opens, could return cached data
 
-- [ ] `[M]` **Webhook delivery fallback** - No alternative delivery
+- [x] `[M]` **Webhook delivery fallback** - ✅ FIXED 2026-01-23
   - File: `trix-api/src/lib/webhook-service.js`
-  - Only retries same endpoint
+  - Added fallback_urls support to webhooks table (array of backup URLs)
+  - Created deliverWebhookToUrl() to deliver to specific URLs
+  - Enhanced deliverWebhook() to try fallback URLs when primary fails
+  - Added notifyWebhookFailure() to alert admins on permanent failures
+  - Created webhook_failure_notifications table for tracking failures
+  - Added 13 comprehensive tests in tests/lib/webhook-service-fallback.test.js
+  - Commit: 5f91919
 
 ### Missing Integration Tests
 
