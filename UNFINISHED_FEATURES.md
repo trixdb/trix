@@ -1,19 +1,19 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 45 [S] + 1 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 19% (107/556 items)
+Overall Progress: [█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 22% (120/556 items)
 
 By Component:
-├── trix-api        [████████████░░░░░░░░] 63%  (19/30)
+├── trix-api        [██████████████░░░░░░] 70%  (21/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
 ├── trix-mcp        [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
 ├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
-├── Tests           [█░░░░░░░░░░░░░░░░░░░]  3%  (6/180)
+├── Tests           [██░░░░░░░░░░░░░░░░░░] 10%  (18/180)
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [████░░░░░░░░░░░░░░░░] 15%  (2/13)
@@ -499,16 +499,16 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### CSRF Protection Tests (13 incomplete)
 - [ ] `[M]` CSRF endpoint implementation
-- [ ] `[S]` Token generation tests
-- [ ] `[S]` Request validation tests
-- [ ] `[S]` File: `tests/security/csrf-protection.test.js`
+- [x] `[S]` Token generation tests - ✅ FIXED 2026-01-23 - Created CSRF test server helper
+- [x] `[S]` Request validation tests - ✅ FIXED 2026-01-23 - All 13 todo tests enabled
+- [x] `[S]` File: `tests/security/csrf-protection.test.js` - ✅ FIXED 2026-01-23
 
 #### Transcription Job Tests (11 incomplete)
 - [ ] `[M]` Segment embeddings storage
 - [ ] `[M]` Embedding failure handling
-- [ ] `[S]` Speaker labels
+- [x] `[S]` Speaker labels - ✅ FIXED 2026-01-23 - Added SegmentRepository mock
 - [ ] `[M]` Transaction rollback scenarios
-- [ ] `[S]` Partial data cleanup
+- [x] `[S]` Partial data cleanup - ✅ FIXED 2026-01-23 - Test validates rollback on failure
 
 #### Billing Race Condition Tests (4 incomplete)
 - [ ] `[M]` Concurrent identical requests
@@ -525,7 +525,7 @@ Estimated Total Effort: ~133 developer-days (3 days completed)
 
 #### Job Queue Dual Storage Tests (8 incomplete)
 - [ ] `[M]` PostgreSQL sync functionality
-- [ ] `[S]` Status tracking
+- [x] `[S]` Status tracking - ✅ FIXED 2026-01-23 - Created JobQueue class with dual storage
 - [ ] `[M]` Retry handling
 
 ### trix-api - Webhook Tests (5 skipped)
