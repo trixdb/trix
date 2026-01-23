@@ -1,11 +1,11 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 33 [S] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 34 [S] + 1 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (94/556 items)
+Overall Progress: [███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 17% (96/556 items)
 
 By Component:
 ├── trix-api        [███████████░░░░░░░░░] 57%  (17/30)
@@ -17,7 +17,7 @@ By Component:
 ├── Migrations      [░░░░░░░░░░░░░░░░░░░░]  0%  (0/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
 ├── Security        [██░░░░░░░░░░░░░░░░░░]  8%  (1/13)
-├── Configuration   [████░░░░░░░░░░░░░░░░] 19%  (10/52)
+├── Configuration   [████░░░░░░░░░░░░░░░░] 23%  (12/52)
 ├── Documentation   [████░░░░░░░░░░░░░░░░] 20%  (2/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
