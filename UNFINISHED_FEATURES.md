@@ -1,14 +1,14 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 5 [L] + 3 [XL] items fixed)
+> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 8 [L] + 5 [XL] items fixed)
 
 ## Progress Overview
 
 ```
-Overall Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 27% (149/556 items)
+Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (154/556 items)
 
 By Component:
-├── trix-api        [████████████████░░░░] 77%  (23/30)
+├── trix-api        [██████████████████░░] 93%  (28/30)
 ├── trix-cli-go     [████████░░░░░░░░░░░░] 40%  (12/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
@@ -21,9 +21,9 @@ By Component:
 ├── Documentation   [██████░░░░░░░░░░░░░░] 30%  (3/10)
 ├── Error Handling  [████████░░░░░░░░░░░░] 40%  (4/10)
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
-└── Integrations    [███░░░░░░░░░░░░░░░░░] 23%  (3/13)
+└── Integrations    [██████░░░░░░░░░░░░░░] 31%  (4/13)
 
-Estimated Total Effort: ~133 developer-days (5.2 days completed)
+Estimated Total Effort: ~133 developer-days (8.5 days completed)
 ```
 
 ### Effort Legend
