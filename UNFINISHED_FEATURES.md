@@ -1,18 +1,18 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-23 (17 [XS] + 58 [S] + 24 [M] + 9 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
+> Last updated: 2026-01-24 (17 [XS] + 58 [S] + 27 [M] + 9 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 28% (157/556 items)
+Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 29% (160/556 items)
 
 By Component:
 ├── trix-api        [████████████████████] 100% (30/30) ✓
 ├── trix-cli-go     [█████████░░░░░░░░░░░] 47%  (14/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
-├── trix-research   [████░░░░░░░░░░░░░░░░] 22%  (43/129)
+├── trix-research   [███████░░░░░░░░░░░░░] 36%  (46/129)
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
 ├── Migrations      [██████░░░░░░░░░░░░░░] 33%  (2/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
@@ -23,7 +23,7 @@ By Component:
 ├── Accessibility   [████████░░░░░░░░░░░░] 43%  (6/14)
 └── Integrations    [██████░░░░░░░░░░░░░░] 31%  (4/13)
 
-Estimated Total Effort: ~133 developer-days (21.5 days completed)
+Estimated Total Effort: ~133 developer-days (23 days completed)
 ```
 
 ### Effort Legend
@@ -459,14 +459,25 @@ Estimated Total Effort: ~133 developer-days (21.5 days completed)
 
 ### Hierarchical Summarization
 
-- [ ] `[M]` Connect summarization services to enrichment system
-- [ ] `[M]` Add periodic jobs for summary regeneration
+- [x] `[M]` Connect summarization services to enrichment system - ✅ COMPLETE 2026-01-24
+  - File: `src/lib/enrichment/processors/` contains cluster, space, and community summary processors
+  - Integrated with BullMQ job queue and enrichment-types.js priority system
+  - Summary processors orchestrated through EnrichmentService
+- [x] `[M]` Add periodic jobs for summary regeneration - ✅ COMPLETE 2026-01-24
+  - File: `src/jobs/summarization-job.js`
+  - Daily at 2 AM: Space summaries with 7-day staleness threshold
+  - Hourly: Pending cluster summaries (batch 50)
+  - Weekly Sundays 3 AM: Community hierarchy regeneration
 - [x] `[S]` Expose summarization endpoints - FIXED 2026-01-23
   - Added GET /v1/memories/:id/summary - Get or generate memory summary
   - Added POST /v1/memories/summarize - Summarize multiple memories together
-- [ ] `[M]` Measure current retrieval performance
+- [ ] `[M]` Measure current retrieval performance - benchmarks needed
 - [ ] `[L]` Update retrieval pipeline to use summaries
-- [ ] `[XL]` Implement GraphRAG approach
+  - Infrastructure exists in `src/lib/retrieval/retrieval-pipeline.js`
+  - Need to add `includeSummaries` option and join summary tables in search
+- [ ] `[XL]` Implement GraphRAG approach (Phase 2)
+  - Phase 1 complete (Louvain communities, hierarchical summaries)
+  - Phase 2 needed: Leiden algorithm, query routing, global search mode
 - [ ] `[L]` Implement Anthropic approach
 
 ### Scenario Testing Scripts
@@ -483,9 +494,18 @@ Estimated Total Effort: ~133 developer-days (21.5 days completed)
 
 ### RAG Frameworks Analysis
 
-- [ ] `[M]` Cross-encoder reranking analysis
+- [x] `[M]` Cross-encoder reranking analysis - ✅ COMPLETE 2026-01-24
+  - File: `src/lib/retrieval/reranker.js` - Cohere Rerank API integration
+  - Production-ready with 267 tests in retrieval-pipeline.test.js
+  - Graceful fallback to mock reranker when Cohere unavailable
+  - Documentation in ADR-010-cohere-reranking.md
 - [ ] `[M]` Metadata filtering analysis
+  - Basic filtering exists in search routes
+  - Missing: Faceted/aggregate search with counts (MCP schema defined, no handler)
 - [ ] `[M]` Query decomposition analysis
+  - Only multi-query expansion exists in `src/lib/retrieval/query-expander.js`
+  - True decomposition (SubQuestionDecomposer, SequentialDecomposer) not implemented
+  - Need ADR and implementation
 
 ### Pending ADRs
 
