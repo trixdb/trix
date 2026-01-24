@@ -1,18 +1,18 @@
 # Unfinished Features Tracker
 
-> Last updated: 2026-01-24 (17 [XS] + 58 [S] + 27 [M] + 9 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
+> Last updated: 2026-01-24 (17 [XS] + 58 [S] + 29 [M] + 9 [L] + 6 [XL] + 1 [XXL] items fixed, 1 skipped)
 
 ## Progress Overview
 
 ```
-Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 29% (160/556 items)
+Overall Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 29% (161/556 items)
 
 By Component:
 ├── trix-api        [████████████████████] 100% (30/30) ✓
 ├── trix-cli-go     [█████████░░░░░░░░░░░] 47%  (14/30)
 ├── trix-mcp        [████████████░░░░░░░░] 60%  (6/10)
 ├── SDKs            [██████████░░░░░░░░░░] 50%  (2/4)
-├── trix-research   [███████░░░░░░░░░░░░░] 36%  (46/129)
+├── trix-research   [███████░░░░░░░░░░░░░] 36%  (47/129)
 ├── Tests           [██░░░░░░░░░░░░░░░░░░] 11%  (19/180)
 ├── Migrations      [██████░░░░░░░░░░░░░░] 33%  (2/6)
 ├── Deprecated      [█████████████░░░░░░░] 67%  (10/15)
@@ -471,10 +471,24 @@ Estimated Total Effort: ~133 developer-days (23 days completed)
 - [x] `[S]` Expose summarization endpoints - FIXED 2026-01-23
   - Added GET /v1/memories/:id/summary - Get or generate memory summary
   - Added POST /v1/memories/summarize - Summarize multiple memories together
-- [ ] `[M]` Measure current retrieval performance - benchmarks needed
-- [ ] `[L]` Update retrieval pipeline to use summaries
-  - Infrastructure exists in `src/lib/retrieval/retrieval-pipeline.js`
-  - Need to add `includeSummaries` option and join summary tables in search
+- [x] `[M]` Measure current retrieval performance - COMPLETE 2026-01-24
+  - Created benchmark framework: `trix-api/scripts/benchmarks/`
+  - Main runner: `retrieval-benchmark.js` with scenarios for all search modes
+  - Config: `benchmark-config.js` with configurable scenarios and metrics
+  - Reports: `benchmark-report.js` generates JSON + Markdown with comparison
+  - Fixtures: `fixtures/sample-data.js` with 1000+ sample memories
+  - Run: `npm run benchmark:retrieval` (full) or `benchmark:retrieval:quick` (CI)
+  - Metrics: latency (p50/p95/p99), throughput, memory, component breakdown
+- [x] `[L]` Update retrieval pipeline to use summaries - ✅ COMPLETE 2026-01-24
+  - File: `src/lib/retrieval/retrieval-pipeline.js`
+  - Added `includeSummaries` option (boolean or object for granular control)
+  - Created `SummaryFetcher` service in `src/lib/retrieval/summary-fetcher.js`
+  - Fetches cluster, space, and community summaries in parallel
+  - Summaries ranked by vector similarity to query
+  - Includes staleness indicator (configurable via `staleSummaryDays`)
+  - Integrated into `SearchService.semanticSearch()` and `hybridSearch()`
+  - 25 TDD tests in `tests/lib/retrieval/retrieval-pipeline-summaries.test.js`
+  - Response format: `{ memories: [...], summaries: { clusters: [], spaces: [], communities: [] } }`
 - [ ] `[XL]` Implement GraphRAG approach (Phase 2)
   - Phase 1 complete (Louvain communities, hierarchical summaries)
   - Phase 2 needed: Leiden algorithm, query routing, global search mode
@@ -499,13 +513,20 @@ Estimated Total Effort: ~133 developer-days (23 days completed)
   - Production-ready with 267 tests in retrieval-pipeline.test.js
   - Graceful fallback to mock reranker when Cohere unavailable
   - Documentation in ADR-010-cohere-reranking.md
-- [ ] `[M]` Metadata filtering analysis
+- [x] `[M]` Metadata filtering analysis - ✅ FIXED 2026-01-24
   - Basic filtering exists in search routes
-  - Missing: Faceted/aggregate search with counts (MCP schema defined, no handler)
-- [ ] `[M]` Query decomposition analysis
-  - Only multi-query expansion exists in `src/lib/retrieval/query-expander.js`
-  - True decomposition (SubQuestionDecomposer, SequentialDecomposer) not implemented
-  - Need ADR and implementation
+  - Faceted/aggregate search with counts: IMPLEMENTED
+  - Created `src/routes/memories/aggregate-search.js` - Route handler for GET /search/aggregate
+  - Created `src/lib/search/faceted-search-service.js` - Service with SOLID principles
+  - Created `src/lib/repositories/FacetedSearchRepository.js` - Repository pattern with Strategy pattern
+  - Supports grouping by: tags, clusters, content_type, priority
+  - 85 TDD tests in `tests/routes/memories/aggregate-search.test.js` and `tests/lib/search/`
+- [x] `[M]` Query decomposition analysis - COMPLETE 2026-01-24
+  - File: `src/lib/retrieval/query-decomposer.js` - Full implementation
+  - Supports SubQuestionDecomposer (parallel) and SequentialDecomposer (dependent chains)
+  - QueryAnalyzer detects complex queries and determines strategy automatically
+  - 56 comprehensive TDD tests in `tests/lib/retrieval/query-decomposer.test.js`
+  - ADR: `trix-research/docs/decisions/ADR-016-query-decomposition.md`
 
 ### Pending ADRs
 
