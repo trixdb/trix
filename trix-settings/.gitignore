@@ -1,0 +1,33 @@
+# Build artifacts
+build/
+frontend/dist/
+frontend/wailsjs/
+
+# Dependencies
+frontend/node_modules/
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.sum
+
+# Wails
+frontend/.svelte-kit/

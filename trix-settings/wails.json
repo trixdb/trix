@@ -1,0 +1,20 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "trix-settings",
+  "outputfilename": "trix-settings",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Trix Team",
+    "email": "team@trix.dev"
+  },
+  "info": {
+    "companyName": "Trix",
+    "productName": "Trix Settings",
+    "productVersion": "0.1.0",
+    "copyright": "Copyright 2026 Trix",
+    "comments": "Settings window for trix-daemon (ADR-032)"
+  }
+}
