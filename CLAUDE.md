@@ -30,6 +30,7 @@ Each subproject has its own CLAUDE.md with specific instructions. When working i
 ## Code Quality Checklist
 
 Before submitting changes:
+
 - [ ] Follows coding standards (file/function size limits)
 - [ ] No over-engineering beyond what was asked
 - [ ] Tests added for critical logic
