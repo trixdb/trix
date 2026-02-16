@@ -1,0 +1,194 @@
+name: Golden Dataset Evaluation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'trix-api/**'
+      - 'trix-mcp/**'
+      - 'trix-research/benchmarks/**'
+
+  workflow_dispatch:
+    inputs:
+      mock_mode:
+        description: 'Run in mock mode (no real API calls)'
+        required: false
+        default: 'false'
+        type: boolean
+
+concurrency:
+  group: evaluation-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  golden-evaluation:
+    name: Golden Dataset Evaluation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: trix-research/benchmarks/golden/package-lock.json
+
+      - name: Install dependencies
+        working-directory: trix-research/benchmarks/golden
+        run: npm ci
+
+      - name: Run type check
+        working-directory: trix-research/benchmarks/golden
+        run: npm run typecheck
+
+      - name: Extract golden dataset (if needed)
+        working-directory: trix-research/benchmarks/golden
+        run: |
+          if [ ! -f data/golden-dataset.json ]; then
+            echo "Golden dataset not found, extracting..."
+            npm run extract
+          else
+            echo "Golden dataset exists, skipping extraction"
+          fi
+
+      - name: Run evaluation
+        id: eval
+        working-directory: trix-research/benchmarks/golden
+        env:
+          TRIX_API_URL: ${{ secrets.TRIX_API_URL }}
+          TRIX_API_KEY: ${{ secrets.TRIX_API_KEY }}
+          TRIX_SPACE_ID: ${{ secrets.TRIX_SPACE_ID }}
+          MOCK_TRIX: ${{ github.event.inputs.mock_mode == 'true' && 'true' || (secrets.TRIX_API_URL == '' && 'true' || 'false') }}
+        run: |
+          echo "Running evaluation (mock mode: $MOCK_TRIX)"
+          npm run eval
+          echo "eval_status=$?" >> $GITHUB_OUTPUT
+
+      - name: Run quality gate
+        id: gate
+        working-directory: trix-research/benchmarks/golden
+        run: |
+          npm run gate
+          echo "gate_status=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload evaluation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-results
+          path: |
+            trix-research/benchmarks/golden/data/latest-results.json
+            trix-research/benchmarks/golden/data/quality-gate-report.md
+          retention-days: 30
+
+      - name: Read quality gate report
+        id: report
+        working-directory: trix-research/benchmarks/golden
+        run: |
+          if [ -f data/quality-gate-report.md ]; then
+            {
+              echo 'report<<EOF'
+              cat data/quality-gate-report.md
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          else
+            echo "report=No report generated" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const report = `${{ steps.report.outputs.report }}`;
+            const gatePassed = '${{ steps.gate.outcome }}' === 'success';
+
+            const body = `### Golden Dataset Evaluation
+
+            ${gatePassed ? ':white_check_mark: **Quality gates passed**' : ':x: **Quality gates failed**'}
+
+            ${report}
+
+            <sub>Run ID: ${{ github.run_id }} | Commit: ${{ github.sha }}</sub>
+            `;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Golden Dataset Evaluation')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Fail if quality gate failed
+        if: steps.gate.outcome == 'failure'
+        run: exit 1
+
+  notify-on-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [golden-evaluation]
+    if: failure()
+
+    steps:
+      - name: Create issue on failure
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const title = `Golden Dataset Evaluation Failed - PR #${context.issue.number}`;
+            const body = `
+            ## Evaluation Failure
+
+            The golden dataset evaluation failed for PR #${context.issue.number}.
+
+            - **PR:** ${{ github.event.pull_request.html_url }}
+            - **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - **Commit:** ${{ github.sha }}
+
+            Please review the evaluation results and fix any regressions before merging.
+            `;
+
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'evaluation-failure',
+            });
+
+            const existingIssue = issues.find(i => i.title.includes(`PR #${context.issue.number}`));
+
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['evaluation-failure', 'automated'],
+              });
+            }
