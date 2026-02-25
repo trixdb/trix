@@ -1,0 +1,3 @@
+[submodule "trix-bots"]
+	path = trix-bots
+	url = git@github.com:trixdb/trix-bots.git
