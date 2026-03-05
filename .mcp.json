@@ -7,6 +7,10 @@
       "headers": {
         "Authorization": "Bearer ${TRIX_API_KEY}"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp", "--browser", "chromium"]
     }
   }
 }
