@@ -31,6 +31,12 @@ Key constraints:
 
 Each subproject has its own CLAUDE.md with specific instructions. When working in a subproject, also check its local CLAUDE.md for project-specific commands and patterns.
 
+## Screenshots
+
+Always save screenshots to the `screenshots/` directory, never the repo root. Examples:
+- playwright-cli: `playwright-cli screenshot --filename=screenshots/my-screenshot.png`
+- Playwright MCP: use `screenshots/` prefix in the file path
+
 ## Code Quality Checklist
 
 Before submitting changes:

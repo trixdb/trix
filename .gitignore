@@ -40,3 +40,10 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Screenshots
+/screenshots/
+
+# Playwright
+.playwright-cli/
+.playwright-mcp/
