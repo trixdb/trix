@@ -96,9 +96,16 @@ bun install   # first time only
 bun dev       # starts on http://localhost:5173
 ```
 
-### 5. Create a User Account
+### 5. Log In
 
-Open http://localhost:5173 and register. The local instance has `REQUIRE_INVITE_CODE=false` so no invite code is needed.
+Open http://localhost:5173 and log in with the test account:
+
+| Field | Value |
+|-------|-------|
+| Email | `robert@zivrio.com` |
+| Password | `123qwe!"#QWE` |
+
+This account is pre-registered on the local stack with a pro subscription and 999k credits. You can also register a new account — the local instance has `REQUIRE_INVITE_CODE=false` so no invite code is needed.
 
 ### 6. Set Up Bots (if needed)
 
