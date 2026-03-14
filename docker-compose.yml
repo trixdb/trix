@@ -1,24 +1,51 @@
-version: '3.9'
+# =============================================================================
+# Trix Local Development Stack
+# =============================================================================
+# Usage:
+#   ./scripts/local-setup.sh              # First-time setup (generates .env.local)
+#   docker compose up -d                  # Start infrastructure + all services
+#   docker compose up -d infra            # Start only databases/storage
+#   docker compose --profile ml up -d     # Include Python ML workers
+#   docker compose --profile visual up -d # Include visual embeddings
+#   docker compose logs -f api            # Tail API logs
+#   docker compose down                   # Stop all services
+#   docker compose down -v                # Stop + delete all data
+#
+# Container naming: All containers use "trix-local-*" prefix to avoid
+# clashes with the per-submodule docker-compose files (which use "trix-*").
+#
+# Port scheme: All host ports use 1xxxx to avoid clashes with local services.
+#   PostgreSQL:     15432    MinIO API:      19000    API:       13737
+#   Valkey/Redis:   16379    MinIO Console:  19001    Workers:   19091
+#   Memgraph Bolt:  17687    Visual Embed:   18090    Bots:      13739
+#   Memgraph Mon:   17444    ML Workers:     19090
+#
+# Environment: .env.local (shared by all services via env_file)
+#   - API keys, secrets, and optional port overrides
+#   - DB/Redis/S3 URLs are set per-service in this file (not in .env.local)
+#   - Generate with: ./scripts/local-setup.sh [--railway]
+# =============================================================================
 
 services:
-  # =============================================================================
-  # PostgreSQL 17 with pgvector extension
-  # =============================================================================
+  # ===========================================================================
+  # Infrastructure
+  # ===========================================================================
+
   postgres:
     image: pgvector/pgvector:pg17
-    container_name: trixdb-postgres
+    container_name: trix-local-postgres
     environment:
       POSTGRES_USER: trix
-      POSTGRES_PASSWORD: trix_secret
+      POSTGRES_PASSWORD: Tr1x_L0cal_S3cret!
       POSTGRES_DB: trix
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
-      - "5433:5432"
+      - "${TRIX_PORT_POSTGRES:-15432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./trixdb/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./trix-api/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     networks:
-      - trixdb
+      - trix
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U trix -d trix"]
       interval: 10s
@@ -27,18 +54,22 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # =============================================================================
-  # Valkey/Redis - for job queues and caching
-  # =============================================================================
-  redis:
-    image: valkey/valkey:7-alpine
-    container_name: trixdb-redis
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: trix-local-valkey
     ports:
-      - "6379:6379"
+      - "${TRIX_PORT_VALKEY:-16379}:6379"
     volumes:
-      - redis_data:/data
+      - valkey_data:/data
     networks:
-      - trixdb
+      - trix
+    command: >
+      valkey-server
+      --appendonly yes
+      --save 60 1000
+      --loglevel warning
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 10s
@@ -46,31 +77,21 @@ services:
       retries: 5
       start_period: 5s
     restart: unless-stopped
-    command: >
-      valkey-server
-      --save 60 1000
-      --loglevel warning
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-      --tcp-keepalive 300
-      --timeout 0
 
-  # =============================================================================
-  # MinIO - S3-compatible storage for audio files and attachments
-  # =============================================================================
   minio:
     image: minio/minio:latest
-    container_name: trixdb-minio
+    container_name: trix-local-minio
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
     ports:
-      - "9000:9000"  # API
-      - "9001:9001"  # Console
+      - "${TRIX_PORT_MINIO_API:-19000}:9000"
+      - "${TRIX_PORT_MINIO_UI:-19001}:9001"
     volumes:
       - minio_data:/data
     networks:
-      - trixdb
+      - trix
+    command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 10s
@@ -78,17 +99,15 @@ services:
       retries: 5
       start_period: 10s
     restart: unless-stopped
-    command: server /data --console-address ":9001"
 
-  # MinIO bucket initialization
   minio-init:
     image: minio/mc:latest
-    container_name: trixdb-minio-init
+    container_name: trix-local-minio-init
     depends_on:
       minio:
         condition: service_healthy
     networks:
-      - trixdb
+      - trix
     entrypoint: >
       /bin/sh -c "
       mc alias set minio http://minio:9000 minioadmin minioadmin123;
@@ -97,47 +116,99 @@ services:
       exit 0;
       "
 
-  # =============================================================================
-  # TrixDB API - Main Node.js application
-  # =============================================================================
-  trixdb:
-    build:
-      context: ./trixdb
-      dockerfile: Dockerfile
-      target: production
-    container_name: trixdb-api
-    env_file:
-      - ./trixdb/.env
-    environment:
-      # Override with container-specific values
-      NODE_ENV: production
-      HOST: 0.0.0.0
-      PORT: 3737
-      DATABASE_URL: postgres://trix:trix_secret@postgres:5432/trix
-      REDIS_URL: redis://redis:6379
-      S3_ENDPOINT: http://minio:9000
-      S3_ACCESS_KEY_ID: minioadmin
-      S3_SECRET_ACCESS_KEY: minioadmin123
-      S3_BUCKET: trix-audio
-      S3_REGION: auto
-      S3_PUBLIC_URL: http://localhost:9000/trix-audio
+  memgraph:
+    image: memgraph/memgraph:latest
+    container_name: trix-local-memgraph
     ports:
-      - "3737:3737"
+      - "${TRIX_PORT_MEMGRAPH:-17687}:7687"
+      - "${TRIX_PORT_MEMGRAPH_MON:-17444}:7444"
+    environment:
+      MEMGRAPH_LOG_LEVEL: ERROR
+      MEMGRAPH_STORAGE_MODE: IN_MEMORY_ANALYTICAL
     volumes:
-      # Optional: Mount source for development
-      # - ./trixdb/src:/app/src:ro
-      - trixdb_uploads:/app/uploads
+      - memgraph_data:/var/lib/memgraph
+      - memgraph_log:/var/log/memgraph
     networks:
-      - trixdb
+      - trix
+    command: >
+      --bolt-port=7687
+      --log-level=ERROR
+      --also-log-to-stderr=true
+      --storage-snapshot-interval-sec=300
+      --storage-wal-enabled=true
+      --query-execution-timeout-sec=30
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'RETURN 1;' | mgconsole --host 127.0.0.1 --port 7687 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # Dummy target so `docker compose up -d infra` works
+  infra:
+    image: busybox:latest
+    container_name: trix-local-infra-ready
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
       minio:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+      memgraph:
+        condition: service_healthy
+    command: ["echo", "Infrastructure ready"]
+
+  # ===========================================================================
+  # Application Services
+  # ===========================================================================
+
+  api:
+    build:
+      context: ./trix-api
+      dockerfile: Dockerfile
+      target: production
+    container_name: trix-local-api
+    env_file:
+      - .env.local
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3737
+      DATABASE_URL: postgres://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
+      REDIS_URL: redis://valkey:6379
+      GRAPH_DB_TYPE: memgraph
+      MEMGRAPH_HOST: memgraph
+      MEMGRAPH_PORT: 7687
+      GRAPH_SYNC_ENABLED: "true"
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin123
+      S3_BUCKET: trix-audio
+      S3_REGION: auto
+      S3_PUBLIC_URL: http://localhost:${TRIX_PORT_MINIO_API:-19000}/trix-audio
+      AUTO_MIGRATE: "true"
+      REQUIRE_INVITE_CODE: "false"
+    ports:
+      - "${TRIX_PORT_API:-13737}:3737"
+    volumes:
+      - api_uploads:/app/uploads
+    networks:
+      - trix
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      memgraph:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3737/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
       interval: 30s
@@ -146,36 +217,36 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # =============================================================================
-  # TrixDB Workers - Node.js background job processors
-  # =============================================================================
-  trixdb-workers-node:
+  workers:
     build:
-      context: ./trixdb-workers-node
+      context: ./trix-workers-node
       dockerfile: Dockerfile
       target: production
-    container_name: trixdb-workers-node
+    container_name: trix-local-workers-node
     env_file:
-      - ./trixdb-workers-node/.env
+      - .env.local
     environment:
-      # Override with container-specific values
       NODE_ENV: production
-      REDIS_HOST: redis
+      REDIS_HOST: valkey
       REDIS_PORT: 6379
-      DATABASE_URL: postgresql://trix:trix_secret@postgres:5432/trix
+      DATABASE_URL: postgresql://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
+      GRAPH_DB_TYPE: memgraph
+      GRAPH_HOST: memgraph
+      GRAPH_PORT: 7687
       HEALTH_PORT: 9091
       HEALTH_HOST: 0.0.0.0
       LOG_LEVEL: info
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin123
+      S3_BUCKET: trix-audio
+      S3_REGION: auto
     ports:
-      - "9091:9091"  # Health check endpoint
+      - "${TRIX_PORT_WORKERS:-19091}:9091"
     networks:
-      - trixdb
+      - trix
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      trixdb:
+      api:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9091/health"]
@@ -185,58 +256,121 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # =============================================================================
-  # TrixDB Workers - Python background processors for ML tasks
-  # =============================================================================
-  trixdb-workers:
+  bots:
     build:
-      context: ./trixdb-workers
+      context: ./trix-bots
       dockerfile: Dockerfile
-      target: production
-    container_name: trixdb-workers-python
+    container_name: trix-local-bots
     env_file:
-      - ./trixdb-workers/.env
+      - .env.local
     environment:
-      # Override with container-specific values
-      TRIXDB_DATABASE_URL: postgresql://trix:trix_secret@postgres:5432/trix
-      TRIXDB_LOG_LEVEL: INFO
-      TRIXDB_LOG_FORMAT: json
-      TRIXDB_METRICS_ENABLED: "true"
-      TRIXDB_METRICS_PORT: 9090
+      DATABASE_URL: postgres://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
+      REDIS_URL: redis://valkey:6379
+      TRIX_API_URL: http://api:3737
+      TRIX_ALLOW_INSECURE: "true"
+      PORT: 3739
+      BOT_WORKER_CONCURRENCY: 5
+      BOT_MAX_TURNS: 10
+      BOT_EXECUTION_TIMEOUT_MS: 120000
     ports:
-      - "9090:9090"  # Metrics/health endpoint
+      - "${TRIX_PORT_BOTS:-13739}:3739"
     networks:
-      - trixdb
+      - trix
     depends_on:
-      postgres:
-        condition: service_healthy
-      trixdb:
+      api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3739/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
     restart: unless-stopped
 
-# =============================================================================
-# Networks
-# =============================================================================
-networks:
-  trixdb:
-    name: trixdb-network
-    driver: bridge
+  # ===========================================================================
+  # Optional Services (use --profile)
+  # ===========================================================================
+
+  # Python ML workers: docker compose --profile ml up -d
+  ml-workers:
+    build:
+      context: ./trix-workers
+      dockerfile: Dockerfile
+      target: production
+    container_name: trix-local-ml-workers
+    env_file:
+      - .env.local
+    environment:
+      TRIXDB_DATABASE_URL: postgresql://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
+      REDIS_URL: redis://valkey:6379
+      TRIXDB_LOG_LEVEL: INFO
+      TRIXDB_METRICS_ENABLED: "true"
+      TRIXDB_METRICS_PORT: 9090
+    ports:
+      - "${TRIX_PORT_ML_WORKERS:-19090}:9090"
+    networks:
+      - trix
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - ml
+
+  # Visual embeddings: docker compose --profile visual up -d
+  visual-embeddings:
+    build:
+      context: ./trix-visual-embeddings
+      dockerfile: Dockerfile
+    container_name: trix-local-visual-embeddings
+    environment:
+      SIGLIP_MODEL: google/siglip-base-patch16-224
+      DEVICE: cpu
+      MAX_BATCH_SIZE: 8
+      PORT: 8080
+    ports:
+      - "${TRIX_PORT_VISUAL:-18090}:8080"
+    volumes:
+      - huggingface_cache:/home/appuser/.cache/huggingface
+    networks:
+      - trix
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 180s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    restart: unless-stopped
+    profiles:
+      - visual
 
 # =============================================================================
-# Volumes - Named volumes for data persistence
+# Networks & Volumes
 # =============================================================================
+
+networks:
+  trix:
+    name: trix-local
+    driver: bridge
+
 volumes:
   postgres_data:
-    name: trixdb-postgres-data
-  redis_data:
-    name: trixdb-redis-data
+    name: trix-local-postgres
+  valkey_data:
+    name: trix-local-valkey
   minio_data:
-    name: trixdb-minio-data
-  trixdb_uploads:
-    name: trixdb-uploads
+    name: trix-local-minio
+  memgraph_data:
+    name: trix-local-memgraph
+  memgraph_log:
+    name: trix-local-memgraph-log
+  api_uploads:
+    name: trix-local-uploads
+  huggingface_cache:
+    name: trix-local-hf-cache
