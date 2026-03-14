@@ -89,7 +89,7 @@ if $PULL_RAILWAY; then
     }
 
     KEYS_UPDATED=0
-    for KEY in ANTHROPIC_API_KEY OPENAI_API_KEY ASSEMBLYAI_API_KEY COHERE_API_KEY JWT_SECRET ASSEMBLYAI_WEBHOOK_SECRET STATUS_INTERNAL_KEY INTEGRATION_ENCRYPTION_KEY COOKIE_SECRET; do
+    for KEY in ANTHROPIC_API_KEY OPENAI_API_KEY GOOGLE_API_KEY MISTRAL_API_KEY ASSEMBLYAI_API_KEY COHERE_API_KEY JWT_SECRET ASSEMBLYAI_WEBHOOK_SECRET STATUS_INTERNAL_KEY INTEGRATION_ENCRYPTION_KEY COOKIE_SECRET; do
       VALUE=$(extract_var "$KEY")
       if [ -n "$VALUE" ]; then
         # Only update if currently blank in .env.local
@@ -151,6 +151,8 @@ check_key() {
 MISSING=0
 check_key "ANTHROPIC_API_KEY" "Anthropic (LLM)" "true" || MISSING=$((MISSING + 1))
 check_key "OPENAI_API_KEY" "OpenAI (embeddings)" "true" || MISSING=$((MISSING + 1))
+check_key "GOOGLE_API_KEY" "Google Gemini (simple queries)" "true" || MISSING=$((MISSING + 1))
+check_key "MISTRAL_API_KEY" "Mistral" "false" || true
 check_key "ASSEMBLYAI_API_KEY" "AssemblyAI (transcription)" "false" || true
 check_key "COHERE_API_KEY" "Cohere (reranking)" "false" || true
 
@@ -211,6 +213,28 @@ if [ $FAILED -gt 0 ]; then
   exit 1
 fi
 
+# ---- Seed subscription for local dev ----
+echo "--- Checking subscription setup ---"
+SUB_COUNT=$(docker exec trix-local-postgres psql -U trix -d trix -t -c "SELECT count(*) FROM account_subscriptions;" 2>/dev/null | tr -d ' ')
+if [ "${SUB_COUNT:-0}" = "0" ]; then
+  ACCOUNT_ID=$(docker exec trix-local-postgres psql -U trix -d trix -t -c "SELECT id FROM accounts LIMIT 1;" 2>/dev/null | tr -d ' ')
+  if [ -n "$ACCOUNT_ID" ] && [ "$ACCOUNT_ID" != "" ]; then
+    docker exec trix-local-postgres psql -U trix -d trix -c "
+      INSERT INTO account_subscriptions (account_id, plan_id, status, current_period_start, current_period_end)
+      SELECT '$ACCOUNT_ID', id, 'active', NOW(), NOW() + INTERVAL '1 year'
+      FROM subscription_plans WHERE name = 'pro';
+      INSERT INTO credit_balances (account_id, credits_available, credits_included, period_start, period_end)
+      VALUES ('$ACCOUNT_ID', 999999, 999999, NOW(), NOW() + INTERVAL '1 year');
+    " &>/dev/null
+    echo "[ok] Seeded pro subscription + credits for local dev account"
+  else
+    echo "[skip] No accounts found yet — register a user first"
+  fi
+else
+  echo "[ok] Subscription already exists"
+fi
+
+echo ""
 echo "=== Trix is running locally ==="
 echo ""
 echo "  API:            http://localhost:${TRIX_PORT_API:-13737}"
