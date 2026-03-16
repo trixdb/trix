@@ -192,6 +192,7 @@ services:
       S3_PUBLIC_URL: http://localhost:${TRIX_PORT_MINIO_API:-19000}/trix-audio
       AUTO_MIGRATE: "true"
       REQUIRE_INVITE_CODE: "false"
+      DISABLE_RATE_LIMITING: "true"
     ports:
       - "${TRIX_PORT_API:-13737}:3737"
     volumes:
