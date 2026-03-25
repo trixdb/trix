@@ -32,15 +32,18 @@ type App struct {
 }
 
 // NewApp creates a new App instance.
-func NewApp(socketPath string) *App {
+func NewApp(socketPath string) (*App, error) {
 	if socketPath == "" {
-		home, _ := os.UserHomeDir()
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, fmt.Errorf("cannot determine home directory: %w", err)
+		}
 		socketPath = filepath.Join(home, ".trix", "daemon.sock")
 	}
 	return &App{
 		socketPath: socketPath,
 		status:     StatusDisconnected,
-	}
+	}, nil
 }
 
 // startup is called when the app starts.

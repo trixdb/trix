@@ -23,9 +23,12 @@ func main() {
 	flag.Parse()
 
 	// Create application with options
-	app := NewApp(*socketPath)
+	app, err := NewApp(*socketPath)
+	if err != nil {
+		log.Fatal("Failed to initialize app:", err)
+	}
 
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:     "Trix Settings",
 		Width:     800,
 		Height:    600,
