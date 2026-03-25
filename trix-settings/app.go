@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 )
 
 // ConnectionStatus represents the daemon connection state.
@@ -23,12 +22,13 @@ const (
 
 // App struct holds the application state.
 type App struct {
-	ctx        context.Context
-	socketPath string
-	ipcClient  *IPCClient
-	mu         sync.RWMutex
-	status     ConnectionStatus
-	lastError  string
+	ctx         context.Context
+	socketPath  string
+	ipcClient   *IPCClient
+	mu          sync.RWMutex
+	status      ConnectionStatus
+	lastError   string
+	connectDone chan struct{}
 }
 
 // NewApp creates a new App instance.
@@ -49,6 +49,7 @@ func NewApp(socketPath string) (*App, error) {
 // startup is called when the app starts.
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	a.connectDone = make(chan struct{})
 	go a.connectToDaemon()
 }
 
@@ -63,7 +64,10 @@ func (a *App) shutdown(ctx context.Context) {
 }
 
 // connectToDaemon establishes connection to the daemon.
+// Signals completion via a.connectDone when finished.
 func (a *App) connectToDaemon() {
+	defer close(a.connectDone)
+
 	a.mu.Lock()
 	a.status = StatusConnecting
 	a.mu.Unlock()
@@ -111,8 +115,9 @@ func (a *App) Reconnect() ConnectionStatusInfo {
 	}
 	a.mu.Unlock()
 
+	a.connectDone = make(chan struct{})
 	go a.connectToDaemon()
-	time.Sleep(100 * time.Millisecond) // Brief wait for connection attempt
+	<-a.connectDone
 
 	return a.GetConnectionStatus()
 }
