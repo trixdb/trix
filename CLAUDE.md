@@ -18,14 +18,23 @@ Key constraints:
 
 | Component | Description |
 |-----------|-------------|
-| `trix-api` | Backend API (Fastify + PostgreSQL) |
-| `trix-mcp` | MCP server for Claude integration |
-| `trix-cli-go` | Go CLI client |
-| `trix-sdk-python` | Python SDK |
-| `trix-sdk-typescript` | TypeScript SDK |
+| `trix-api` | Backend API (Fastify + PostgreSQL) — production-ready |
+| `trix-mcp` | MCP server for Claude — 280+ tools, production-ready |
+| `trix-cli-go` | Go CLI — 508 methods, production-ready |
+| `trix-sdk-python` | Python SDK — 27 domains, production-ready |
+| `trix-sdk-typescript` | TypeScript SDK — 31 endpoints, production-ready |
+| `trix-sdk-csharp` | .NET SDK (NuGet: Trix.Client) |
+| `trix-workers-node` | Background workers (BullMQ) — 52 processors |
+| `trix-workers` | Legacy background workers (decay, consolidation, clustering) |
+| `trix-bots` | Bot/agent execution worker service |
 | `trix-daemon` | Background daemon |
+| `trix-settings` | Wails v2 settings app for trix-daemon |
+| `trix-app` | Web application |
+| `trix-cli-admin` | Admin CLI (waitlist, onboarding via Loops.so) |
 | `trix-landing` | Landing page |
+| `trix-visual-embeddings` | SigLIP 2 visual embedding service |
 | `trix-research` | Research and documentation |
+| `trix-sdk-*-examples` | Example repos for Python, TypeScript, and C# SDKs |
 
 ## Working Across Components
 
