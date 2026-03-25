@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sync"
 )
 
@@ -256,14 +257,25 @@ func (a *App) TriggerSync() error {
 	return err
 }
 
+// hotkeyPattern matches formats like "Ctrl+X", "Ctrl+Alt+Space", "Super+Shift+F1".
+// Requires at least one modifier (Ctrl, Alt, Shift, Super, Cmd, Meta) followed by a key.
+var hotkeyPattern = regexp.MustCompile(
+	`^(Ctrl|Alt|Shift|Super|Cmd|Meta)(\+(Ctrl|Alt|Shift|Super|Cmd|Meta))*\+[A-Za-z0-9F][A-Za-z0-9]*$`,
+)
+
 // ValidateHotkey checks if a hotkey combination is available.
 func (a *App) ValidateHotkey(hotkey string) HotkeyValidation {
 	// TODO: Implement actual conflict detection via daemon
-	// For now, return basic validation
 	if hotkey == "" {
 		return HotkeyValidation{
 			Valid:   false,
 			Message: "Hotkey cannot be empty",
+		}
+	}
+	if !hotkeyPattern.MatchString(hotkey) {
+		return HotkeyValidation{
+			Valid:   false,
+			Message: "Invalid format: use Modifier+Key (e.g. Ctrl+Alt+Space)",
 		}
 	}
 	return HotkeyValidation{
