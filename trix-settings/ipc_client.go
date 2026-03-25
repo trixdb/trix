@@ -110,6 +110,10 @@ func (c *IPCClient) Call(method string, params map[string]interface{}) (*IPCResp
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
+	if resp.ID != req.ID {
+		return nil, fmt.Errorf("response ID mismatch: expected %s, got %s", req.ID, resp.ID)
+	}
+
 	if resp.Error != "" {
 		return nil, fmt.Errorf("daemon error (code %d): %s", resp.Code, resp.Error)
 	}
