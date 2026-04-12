@@ -43,7 +43,8 @@ That's it. The setup script handles Docker, migrations, subscriptions, and healt
 
 | Service | Port | Command |
 |---------|------|---------|
-| trix-app (Retrix) | 5173 | `cd trix-app && bun dev` |
+| trix-app (Retrix) — dev | 5173 | `cd trix-app && bun dev` |
+| trix-app (Retrix) — preview/prod | 4737 | `cd trix-app && bun run build && bun run start` |
 
 The Vite dev server proxies `/auth`, `/v1`, `/ws` to the local API at `localhost:13737`.
 
