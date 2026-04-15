@@ -6,10 +6,11 @@
   import MemorySync from './lib/components/MemorySync.svelte';
   import Privacy from './lib/components/Privacy.svelte';
   import Advanced from './lib/components/Advanced.svelte';
+  import LocalModels from './lib/components/LocalModels.svelte';
   import StatusBar from './lib/components/StatusBar.svelte';
   import { settingsStore, loadConfig, connectionStatus } from './lib/api';
 
-  type Category = 'general' | 'notifications' | 'shortcuts' | 'sync' | 'privacy' | 'advanced';
+  type Category = 'general' | 'notifications' | 'shortcuts' | 'models' | 'sync' | 'privacy' | 'advanced';
 
   let activeCategory: Category = 'general';
   let loading = true;
@@ -19,6 +20,7 @@
     { id: 'general', label: 'General', icon: 'cog' },
     { id: 'notifications', label: 'Notifications', icon: 'bell' },
     { id: 'shortcuts', label: 'Keyboard Shortcuts', icon: 'keyboard' },
+    { id: 'models', label: 'Local Models', icon: 'brain' },
     { id: 'sync', label: 'Memory & Sync', icon: 'sync' },
     { id: 'privacy', label: 'Privacy', icon: 'shield' },
     { id: 'advanced', label: 'Advanced', icon: 'settings' },
@@ -55,6 +57,7 @@
             cat.icon === 'bell' ? '🔔' :
             cat.icon === 'keyboard' ? '⌨️' :
             cat.icon === 'sync' ? '🔄' :
+            cat.icon === 'brain' ? '🧠' :
             cat.icon === 'shield' ? '🛡️' : '⚡'}</span>
           <span class="nav-label">{cat.label}</span>
         </button>
@@ -80,6 +83,8 @@
           <Notifications />
         {:else if activeCategory === 'shortcuts'}
           <KeyboardShortcuts />
+        {:else if activeCategory === 'models'}
+          <LocalModels />
         {:else if activeCategory === 'sync'}
           <MemorySync />
         {:else if activeCategory === 'privacy'}

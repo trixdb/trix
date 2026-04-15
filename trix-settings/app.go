@@ -291,6 +291,52 @@ type HotkeyValidation struct {
 	Conflict string `json:"conflict,omitempty"`
 }
 
+// callIPC is the shared helper for Local LLM methods: checks connection
+// and forwards to the IPC client, returning the raw decoded Result.
+func (a *App) callIPC(method string, params map[string]interface{}) (interface{}, error) {
+	a.mu.RLock()
+	client := a.ipcClient
+	a.mu.RUnlock()
+	if client == nil {
+		return nil, fmt.Errorf("not connected to daemon")
+	}
+	resp, err := client.Call(method, params)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result, nil
+}
+
+// LocalLLMCapabilities returns host/GPU/backend capabilities.
+func (a *App) LocalLLMCapabilities() (interface{}, error) {
+	return a.callIPC("locallm.capabilities", nil)
+}
+
+// LocalLLMCatalog returns the bundled catalog scored for this host.
+func (a *App) LocalLLMCatalog() (interface{}, error) {
+	return a.callIPC("locallm.catalog", nil)
+}
+
+// LocalLLMList returns installed ollama models.
+func (a *App) LocalLLMList() (interface{}, error) {
+	return a.callIPC("locallm.list", nil)
+}
+
+// LocalLLMRemove deletes an installed model by ref.
+func (a *App) LocalLLMRemove(ref string) error {
+	_, err := a.callIPC("locallm.remove", map[string]interface{}{"ref": ref})
+	return err
+}
+
+// OllamaInstall triggers the daemon's consent-gated auto-installer
+// (ADR-141 Guardrail #9). The caller MUST have shown the user a
+// consent dialog first; the daemon re-verifies consent and enforces
+// HTTPS + SHA256 pin internally. Returns the install result (binary
+// path, detected version, source) or an error string.
+func (a *App) OllamaInstall() (interface{}, error) {
+	return a.callIPC("ollama.install", map[string]interface{}{"consent": true})
+}
+
 // DaemonStatus represents the daemon's current state.
 type DaemonStatus struct {
 	Version      string `json:"version"`

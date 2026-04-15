@@ -120,6 +120,89 @@ export interface HotkeyValidation {
   conflict?: string;
 }
 
+// Local LLM types (mirrors trix-daemon NodeCapabilities / CatalogRow)
+
+export interface GPUInfo {
+  vendor: string;
+  model?: string;
+  vram_mb: number;
+  unified_memory: boolean;
+}
+
+export interface HostCapabilities {
+  os: string;
+  arch: string;
+  cpu_cores: number;
+  ram_mb: number;
+  gpu: GPUInfo;
+}
+
+export interface FeaturedSummary {
+  ref: string;
+  tier: string;
+  reason: string;
+}
+
+export interface InferenceBackend {
+  name: string;
+  available: boolean;
+  installable: boolean;
+  version?: string;
+  source?: string;
+}
+
+export interface NodeCapabilities {
+  schema_version: number;
+  probed_at: string;
+  host: HostCapabilities;
+  available_for_models_mb: number;
+  backends: Record<string, InferenceBackend>;
+  recommended_model?: FeaturedSummary | null;
+}
+
+export interface CatalogEntry {
+  ref: string;
+  family: string;
+  params_b: number;
+  quant: string;
+  size_bytes: number;
+  num_ctx_max: number;
+  supports_tools: 'full' | 'partial' | 'none';
+  tier: 'fast' | 'balanced' | 'best';
+  description: string;
+  license: string;
+}
+
+export interface Fit {
+  badge: 'green' | 'yellow' | 'red' | 'unknown';
+  reason: string;
+  required_mb: number;
+  available_mb: number;
+  headroom_mb: number;
+}
+
+export interface CatalogRow {
+  entry: CatalogEntry;
+  fit: Fit;
+}
+
+export interface InstalledModel {
+  ref: string;
+  digest: string;
+  size_text: string;
+  modified: string;
+}
+
+// ADR-141 Guardrail #9 — Ollama auto-install result shape returned by
+// the daemon after a consent-gated Install() call succeeds.
+export interface OllamaInstallResult {
+  binary_path: string;
+  version: string;
+  source: string;
+  sha256: string;
+  url: string;
+}
+
 // Default settings for when daemon is not connected
 const defaultSettings: SettingsConfig = {
   general: {
@@ -202,6 +285,11 @@ declare global {
           TriggerSync(): Promise<void>;
           ReloadConfig(): Promise<void>;
           ValidateHotkey(hotkey: string): Promise<HotkeyValidation>;
+          LocalLLMCapabilities(): Promise<NodeCapabilities>;
+          LocalLLMCatalog(): Promise<CatalogRow[]>;
+          LocalLLMList(): Promise<InstalledModel[]>;
+          LocalLLMRemove(ref: string): Promise<void>;
+          OllamaInstall(): Promise<OllamaInstallResult>;
         };
       };
     };
