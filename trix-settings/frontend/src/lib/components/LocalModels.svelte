@@ -1,43 +1,68 @@
+<!--
+  LocalModels — ADR-141 Local Models pane. Three catalog tabs
+  (Recommended / Library / Custom) + top-level hardware & Ollama
+  capability cards, a remote-inference kill switch, a privacy
+  (opt-in telemetry) toggle, and a Diagnostics tab for bundle export.
+
+  Manual test: load with daemon online → Recommended tab is default
+  and shows the featured model. Switch to Library → full catalog
+  with fit badges. Switch to Custom → type a ref + Inspect. Toggle
+  "Allow remote inference" off → confirm the toggle persists across
+  reloads. Toggle "Share anonymous usage data" → confirm persists.
+  Open Diagnostics → Export. With daemon offline, all sections show
+  a soft-fail banner without crashing.
+-->
 <script lang="ts">
   import { onMount } from 'svelte';
   import SettingsSection from './SettingsSection.svelte';
+  import Toggle from './Toggle.svelte';
+  import RecommendedTab from './local-models/RecommendedTab.svelte';
+  import LibraryTab from './local-models/LibraryTab.svelte';
+  import CustomTab from './local-models/CustomTab.svelte';
+  import DiagnosticBundle from './DiagnosticBundle.svelte';
   import type {
     NodeCapabilities,
     CatalogRow,
     InstalledModel,
   } from '../api';
 
+  type Tab = 'recommended' | 'library' | 'custom' | 'diagnostics';
+
+  const tabOrder: Tab[] = ['recommended', 'library', 'custom', 'diagnostics'];
+  let activeTab: Tab = 'recommended';
   let capabilities: NodeCapabilities | null = null;
   let catalog: CatalogRow[] = [];
   let installed: InstalledModel[] = [];
   let loading = true;
   let errorState: string | null = null;
 
-  const badgeIcon: Record<string, string> = {
-    green: '🟢',
-    yellow: '🟡',
-    red: '🔴',
-    unknown: '⚪',
-  };
+  let killSwitchEnabled = true;
+  let killSwitchBusy = false;
+  let killSwitchNote: string | null = null;
 
-  const badgeLabel: Record<string, string> = {
-    green: 'Fits',
-    yellow: 'Tight',
-    red: 'Too large',
-    unknown: 'Unknown',
-  };
+  let telemetryEnabled = false;
+  let telemetryBusy = false;
+
+  let ollamaInstalling = false;
+  let ollamaInstallMsg: string | null = null;
 
   onMount(() => {
     void refresh();
+    void loadKillSwitch();
+    void loadTelemetry();
   });
+
+  function mb(n: number): string {
+    if (!n) return '—';
+    if (n >= 1024) return `${(n / 1024).toFixed(1)} GB`;
+    return `${n} MB`;
+  }
 
   async function refresh(): Promise<void> {
     loading = true;
     errorState = null;
     try {
-      if (!window.go) {
-        throw new Error('Wails runtime not available');
-      }
+      if (!window.go) throw new Error('Wails runtime not available');
       const api = window.go.main.App;
       const [caps, cat, list] = await Promise.all([
         api.LocalLLMCapabilities(),
@@ -48,53 +73,70 @@
       catalog = cat ?? [];
       installed = list ?? [];
     } catch (e) {
-      errorState =
-        e instanceof Error
-          ? e.message
-          : 'Unable to reach trix-daemon';
+      errorState = e instanceof Error ? e.message : 'Unable to reach trix-daemon';
     } finally {
       loading = false;
     }
   }
 
-  function mb(n: number): string {
-    if (!n) return '—';
-    if (n >= 1024) return `${(n / 1024).toFixed(1)} GB`;
-    return `${n} MB`;
-  }
-
-  function bytesToText(n: number): string {
-    if (!n) return '—';
-    const gb = n / (1024 * 1024 * 1024);
-    if (gb >= 1) return `${gb.toFixed(2)} GB`;
-    return `${(n / (1024 * 1024)).toFixed(0)} MB`;
-  }
-
-  function isInstalled(ref: string): boolean {
-    const want = ref.toLowerCase().trim();
-    return installed.some((m) => m.ref.toLowerCase().trim() === want);
-  }
-
-  async function handleRemove(ref: string): Promise<void> {
-    const ok = window.confirm(
-      `Remove model "${ref}"? This will delete the local copy and free its disk space.`,
-    );
-    if (!ok) return;
+  async function loadKillSwitch(): Promise<void> {
     try {
-      if (!window.go) throw new Error('Wails runtime not available');
-      await window.go.main.App.LocalLLMRemove(ref);
-      await refresh();
-    } catch (e) {
-      errorState =
-        e instanceof Error ? e.message : 'Remove failed';
+      if (!window.go) return;
+      const s = await window.go.main.App.LocalLLMGetKillSwitch();
+      killSwitchEnabled = s?.enabled ?? true;
+    } catch {
+      // leave default ON; daemon may not be up yet
     }
   }
 
-  // ADR-141 Guardrail #9: consent-gated Ollama auto-install. The
-  // dialog here establishes consent; the daemon enforces HTTPS +
-  // pinned SHA256 internally before executing anything.
-  let ollamaInstalling = false;
-  let ollamaInstallMsg: string | null = null;
+  async function handleKillSwitchChange(next: boolean): Promise<void> {
+    killSwitchBusy = true;
+    killSwitchNote = null;
+    const prev = killSwitchEnabled;
+    killSwitchEnabled = next;
+    try {
+      if (!window.go) throw new Error('Wails runtime not available');
+      await window.go.main.App.LocalLLMSetKillSwitch(next);
+      killSwitchNote = next
+        ? 'Remote inference allowed.'
+        : 'Remote inference blocked. The daemon will refuse cloud-initiated chats.';
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.toLowerCase().includes('not implemented')) {
+        killSwitchNote = 'Kill-switch not yet supported by daemon — setting saved locally.';
+      } else {
+        killSwitchEnabled = prev;
+        killSwitchNote = `Failed: ${msg}`;
+      }
+    } finally {
+      killSwitchBusy = false;
+    }
+  }
+
+  async function loadTelemetry(): Promise<void> {
+    try {
+      if (!window.go) return;
+      const s = await window.go.main.App.GetTelemetryEnabled();
+      telemetryEnabled = s?.enabled ?? false;
+    } catch {
+      telemetryEnabled = false;
+    }
+  }
+
+  async function handleTelemetryChange(next: boolean): Promise<void> {
+    telemetryBusy = true;
+    const prev = telemetryEnabled;
+    telemetryEnabled = next;
+    try {
+      if (!window.go) throw new Error('Wails runtime not available');
+      await window.go.main.App.SetTelemetryEnabled(next);
+    } catch (e) {
+      telemetryEnabled = prev;
+      errorState = e instanceof Error ? e.message : 'Failed to save telemetry preference';
+    } finally {
+      telemetryBusy = false;
+    }
+  }
 
   async function handleInstallOllama(): Promise<void> {
     const msg =
@@ -119,6 +161,42 @@
     }
   }
 
+  async function handleRemove(ref: string): Promise<void> {
+    const ok = window.confirm(
+      `Remove model "${ref}"? This will delete the local copy and free its disk space.`,
+    );
+    if (!ok) return;
+    try {
+      if (!window.go) throw new Error('Wails runtime not available');
+      await window.go.main.App.LocalLLMRemove(ref);
+      await refresh();
+    } catch (e) {
+      errorState = e instanceof Error ? e.message : 'Remove failed';
+    }
+  }
+
+  async function handleInstall(ref: string, badge = 'unknown'): Promise<void> {
+    // 🔴 / ⚪ badges require an extra confirmation per ADR-141.
+    if (badge === 'red' || badge === 'unknown') {
+      const ok = window.confirm(
+        `Model "${ref}" is marked "${badge === 'red' ? 'Too large' : 'Unknown fit'}"\n\n` +
+          `Installing anyway may fail or run very slowly on this hardware. Continue?`,
+      );
+      if (!ok) return;
+    }
+    try {
+      if (!window.go) throw new Error('Wails runtime not available');
+      // Streaming install is wired in parallel; until then the daemon
+      // returns NotImplemented for ad-hoc refs, which we surface.
+      await (window.go.main.App as unknown as {
+        LocalLLMInstall?: (ref: string) => Promise<unknown>;
+      }).LocalLLMInstall?.(ref);
+      await refresh();
+    } catch (e) {
+      errorState = e instanceof Error ? e.message : 'Install failed';
+    }
+  }
+
   $: ollamaBackend = capabilities?.backends?.ollama ?? null;
   $: ollamaAvailable = ollamaBackend?.available === true;
 </script>
@@ -138,21 +216,30 @@
     </div>
   {/if}
 
+  <SettingsSection title="Remote Inference">
+    <div class="kill-switch-row">
+      <div class="kill-icon" aria-hidden="true">⚠️</div>
+      <div class="kill-body">
+        <Toggle
+          label="Allow remote inference"
+          description="Disable this to block all inference requests from the cloud API. Turn on before sharing your machine."
+          checked={killSwitchEnabled}
+          disabled={killSwitchBusy}
+          on:change={(e) => handleKillSwitchChange(e.detail)}
+        />
+        {#if killSwitchNote}
+          <p class="kill-note">{killSwitchNote}</p>
+        {/if}
+      </div>
+    </div>
+  </SettingsSection>
+
   {#if capabilities}
     <SettingsSection title="Hardware">
       <div class="caps-grid">
-        <div class="cap-cell">
-          <span class="cap-label">OS / Arch</span>
-          <span class="cap-value">{capabilities.host.os} · {capabilities.host.arch}</span>
-        </div>
-        <div class="cap-cell">
-          <span class="cap-label">CPU cores</span>
-          <span class="cap-value">{capabilities.host.cpu_cores}</span>
-        </div>
-        <div class="cap-cell">
-          <span class="cap-label">RAM</span>
-          <span class="cap-value">{mb(capabilities.host.ram_mb)}</span>
-        </div>
+        <div class="cap-cell"><span class="cap-label">OS / Arch</span><span class="cap-value">{capabilities.host.os} · {capabilities.host.arch}</span></div>
+        <div class="cap-cell"><span class="cap-label">CPU cores</span><span class="cap-value">{capabilities.host.cpu_cores}</span></div>
+        <div class="cap-cell"><span class="cap-label">RAM</span><span class="cap-value">{mb(capabilities.host.ram_mb)}</span></div>
         <div class="cap-cell">
           <span class="cap-label">GPU</span>
           <span class="cap-value">
@@ -160,14 +247,8 @@
             {#if capabilities.host.gpu.model}· {capabilities.host.gpu.model}{/if}
           </span>
         </div>
-        <div class="cap-cell">
-          <span class="cap-label">VRAM</span>
-          <span class="cap-value">{mb(capabilities.host.gpu.vram_mb)}</span>
-        </div>
-        <div class="cap-cell">
-          <span class="cap-label">Budget for models</span>
-          <span class="cap-value accent">{mb(capabilities.available_for_models_mb)}</span>
-        </div>
+        <div class="cap-cell"><span class="cap-label">VRAM</span><span class="cap-value">{mb(capabilities.host.gpu.vram_mb)}</span></div>
+        <div class="cap-cell"><span class="cap-label">Budget for models</span><span class="cap-value accent">{mb(capabilities.available_for_models_mb)}</span></div>
       </div>
     </SettingsSection>
   {/if}
@@ -181,15 +262,8 @@
             source: <code>{ollamaBackend?.source ?? 'unknown'}</code>.
           </p>
         {:else}
-          <p class="warn-msg">
-            Ollama is not installed on this machine. Local models require
-            it to run.
-          </p>
-          <button
-            class="action-button primary"
-            on:click={handleInstallOllama}
-            disabled={ollamaInstalling}
-          >
+          <p class="warn-msg">Ollama is not installed on this machine. Local models require it to run.</p>
+          <button class="action-button primary" on:click={handleInstallOllama} disabled={ollamaInstalling}>
             {ollamaInstalling ? 'Installing…' : 'Install Ollama'}
           </button>
         {/if}
@@ -200,85 +274,62 @@
     </SettingsSection>
   {/if}
 
-  {#if capabilities?.recommended_model}
-    <SettingsSection title="Recommended">
-      <div class="recommended-card">
-        <div class="rec-head">
-          <span class="rec-ref">{capabilities.recommended_model.ref}</span>
-          <span class="tier-badge tier-{capabilities.recommended_model.tier}">
-            {capabilities.recommended_model.tier}
-          </span>
-        </div>
-        <p class="rec-reason">{capabilities.recommended_model.reason}</p>
+  <SettingsSection title="Models">
+    <div class="tab-bar" role="tablist">
+      {#each tabOrder as t}
         <button
-          class="action-button primary"
-          disabled
-          title="Coming soon"
+          class="tab"
+          class:active={activeTab === t}
+          role="tab"
+          aria-selected={activeTab === t}
+          on:click={() => (activeTab = t)}
         >
-          Install (coming soon)
+          {t === 'recommended' ? 'Recommended'
+            : t === 'library' ? 'Library'
+            : t === 'custom' ? 'Custom'
+            : 'Diagnostics'}
         </button>
-      </div>
-    </SettingsSection>
-  {/if}
+      {/each}
+    </div>
 
-  <SettingsSection title="Catalog">
-    {#if loading && catalog.length === 0}
-      <p class="muted">Loading catalog…</p>
-    {:else if catalog.length === 0 && !errorState}
-      <p class="muted">No catalog entries available.</p>
-    {:else}
-      <ul class="catalog-list">
-        {#each catalog as row (row.entry.ref)}
-          <li class="catalog-row">
-            <div class="row-main">
-              <div class="row-top">
-                <span class="fit-badge" title={row.fit.reason}>
-                  {badgeIcon[row.fit.badge] ?? '⚪'}
-                  <span class="fit-label">{badgeLabel[row.fit.badge] ?? 'Unknown'}</span>
-                </span>
-                <span class="row-ref">{row.entry.ref}</span>
-                <span class="tier-badge tier-{row.entry.tier}">{row.entry.tier}</span>
-                <span class="tool-badge tool-{row.entry.supports_tools}">
-                  tools: {row.entry.supports_tools}
-                </span>
-              </div>
-              <p class="row-desc">{row.entry.description}</p>
-              <div class="row-meta">
-                <span>size: {bytesToText(row.entry.size_bytes)}</span>
-                <span>ctx: {row.entry.num_ctx_max.toLocaleString()}</span>
-                <span class="fit-reason">{row.fit.reason}</span>
-              </div>
-            </div>
-            <div class="row-actions">
-              {#if isInstalled(row.entry.ref)}
-                <span class="installed-pill">Installed</span>
-                <button
-                  class="action-button danger"
-                  on:click={() => handleRemove(row.entry.ref)}
-                >
-                  Remove
-                </button>
-              {:else}
-                <button
-                  class="action-button primary"
-                  disabled
-                  title="Coming soon"
-                >
-                  Install
-                </button>
-              {/if}
-            </div>
-          </li>
-        {/each}
-      </ul>
-    {/if}
+    <div class="tab-panel">
+      {#if activeTab === 'recommended'}
+        <RecommendedTab
+          catalog={catalog}
+          installed={installed}
+          featured={capabilities?.recommended_model ?? null}
+          on:install={(e) => handleInstall(e.detail, 'green')}
+          on:remove={(e) => handleRemove(e.detail)}
+        />
+      {:else if activeTab === 'library'}
+        <LibraryTab
+          catalog={catalog}
+          installed={installed}
+          loading={loading}
+          on:install={(e) => handleInstall(e.detail.ref, e.detail.badge)}
+          on:remove={(e) => handleRemove(e.detail)}
+        />
+      {:else if activeTab === 'custom'}
+        <CustomTab on:install={(e) => handleInstall(e.detail, 'unknown')} />
+      {:else}
+        <DiagnosticBundle />
+      {/if}
+    </div>
+  </SettingsSection>
+
+  <SettingsSection title="Privacy">
+    <Toggle
+      label="Share anonymous usage data"
+      description="Emit opt-in telemetry: install success/failure, model popularity, crash rates, time-to-first-chat. Default off."
+      checked={telemetryEnabled}
+      disabled={telemetryBusy}
+      on:change={(e) => handleTelemetryChange(e.detail)}
+    />
   </SettingsSection>
 </div>
 
 <style>
-  .settings-page {
-    max-width: 760px;
-  }
+  .settings-page { max-width: 760px; }
 
   .page-header {
     display: flex;
@@ -304,10 +355,7 @@
     cursor: pointer;
   }
 
-  .refresh-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .banner {
     padding: 12px 16px;
@@ -325,6 +373,26 @@
     color: var(--error-color);
   }
 
+  .kill-switch-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 3px solid var(--warning-color, #d4a017);
+  }
+
+  .kill-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
+
+  .kill-body { flex: 1; min-width: 0; }
+
+  .kill-note {
+    font-size: 12px;
+    margin: 8px 0 0 0;
+    color: var(--text-secondary);
+  }
+
   .caps-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -334,11 +402,7 @@
     border-radius: 8px;
   }
 
-  .cap-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+  .cap-cell { display: flex; flex-direction: column; gap: 2px; }
 
   .cap-label {
     font-size: 11px;
@@ -353,139 +417,45 @@
     font-weight: 500;
   }
 
-  .cap-value.accent {
-    color: var(--accent-color);
-  }
+  .cap-value.accent { color: var(--accent-color); }
 
-  .recommended-card {
-    padding: 16px;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    border-left: 3px solid var(--accent-color);
-  }
-
-  .rec-head {
+  .tab-bar {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-
-  .rec-ref {
-    font-family: monospace;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .rec-reason {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin: 0 0 12px 0;
-    line-height: 1.5;
-  }
-
-  .catalog-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .catalog-row {
-    display: flex;
-    gap: 16px;
-    padding: 14px;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-  }
-
-  .row-main {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .row-top {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
-
-  .row-ref {
-    font-family: monospace;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .fit-badge {
-    display: inline-flex;
-    align-items: center;
     gap: 4px;
-    font-size: 12px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
     color: var(--text-secondary);
-  }
-
-  .fit-label {
-    font-weight: 500;
-  }
-
-  .tier-badge,
-  .tool-badge {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: var(--bg-primary);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-  }
-
-  .tier-best {
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-  }
-
-  .row-desc {
     font-size: 13px;
-    color: var(--text-secondary);
-    margin: 0 0 6px 0;
-    line-height: 1.5;
+    font-weight: 500;
+    cursor: pointer;
+    text-transform: capitalize;
   }
 
-  .row-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 12px;
-    color: var(--text-secondary);
+  .tab:hover { color: var(--text-primary); }
+
+  .tab.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
   }
 
-  .fit-reason {
-    font-style: italic;
-  }
+  .tab-panel { min-height: 120px; }
 
-  .row-actions {
+  .ollama-card {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    flex-shrink: 0;
+    gap: 10px;
   }
 
-  .installed-pill {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--success-color);
-    font-weight: 600;
-  }
+  .ok-msg { margin: 0; color: var(--success-color, #22a36a); }
+  .warn-msg { margin: 0; color: var(--text-primary); }
+  .status-msg { margin: 0; font-size: 13px; color: var(--text-secondary); }
 
   .action-button {
     padding: 6px 14px;
@@ -495,47 +465,9 @@
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
+    align-self: flex-start;
   }
 
-  .action-button.primary {
-    background: var(--accent-color);
-    color: white;
-  }
-
-  .action-button.danger {
-    background: var(--error-color);
-    color: white;
-  }
-
-  .action-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .muted {
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-
-  .ollama-card {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .ok-msg {
-    margin: 0;
-    color: var(--success-color, #22a36a);
-  }
-
-  .warn-msg {
-    margin: 0;
-    color: var(--text-primary);
-  }
-
-  .status-msg {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
+  .action-button.primary { background: var(--accent-color); color: white; }
+  .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

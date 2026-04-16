@@ -203,6 +203,26 @@ export interface OllamaInstallResult {
   url: string;
 }
 
+// ADR-141 kill-switch state for "allow remote inference".
+export interface KillSwitchState {
+  enabled: boolean;
+  source?: string;
+}
+
+// ADR-141 opt-in telemetry flag.
+export interface TelemetryState {
+  enabled: boolean;
+}
+
+// ADR-141 diagnostics.export result from the backend after the user
+// picks a save destination (or cancels).
+export interface DiagnosticsBundle {
+  savedPath?: string;
+  sizeBytes: number;
+  generatedAt: string;
+  cancelled?: boolean;
+}
+
 // Default settings for when daemon is not connected
 const defaultSettings: SettingsConfig = {
   general: {
@@ -290,6 +310,12 @@ declare global {
           LocalLLMList(): Promise<InstalledModel[]>;
           LocalLLMRemove(ref: string): Promise<void>;
           OllamaInstall(): Promise<OllamaInstallResult>;
+          LocalLLMGetKillSwitch(): Promise<KillSwitchState>;
+          LocalLLMSetKillSwitch(enabled: boolean): Promise<void>;
+          LocalLLMInspectRef(ref: string): Promise<unknown>;
+          GetTelemetryEnabled(): Promise<TelemetryState>;
+          SetTelemetryEnabled(enabled: boolean): Promise<void>;
+          DiagnosticsExport(): Promise<DiagnosticsBundle>;
         };
       };
     };
