@@ -37,9 +37,9 @@ export const JOB_DEFAULTS = {
 
 ### S1-2: Scheduled Stale Run Reaper
 
-- [ ] Extract `reapStaleRuns` from `trix-api/src/routes/agent-runs.js:90` into `src/lib/run-reaper.js`
-- [ ] Update extracted function to reap across all accounts (remove `account_id = $1` filter)
-- [ ] Add `setInterval` call in `trix-api/src/server.js` startup to run every 10 minutes
+- [x] Extract `reapStaleRuns` from `trix-api/src/routes/agent-runs.js:90` into `src/lib/run-reaper.js`
+- [x] Update extracted function to reap across all accounts (remove `account_id = $1` filter)
+- [x] Add `setInterval` call in `trix-api/src/server.js` startup to run every 10 minutes
 
 **Current:** Reaper only fires when a client calls `GET /agents/runs` — stuck runs persist indefinitely if no one looks.
 **Change:** Add an interval at server startup:
@@ -60,8 +60,8 @@ setInterval(() => {
 
 ### S1-3: Per-Tool Execution Timeout
 
-- [ ] Add `TOOL_TIMEOUT_MS` map and `withToolTimeout` wrapper in `trix-bots/src/runner/agent-tool-processor.ts`
-- [ ] Apply wrapper to each tool execution in the parallel batch (~line 110)
+- [x] Add `TOOL_TIMEOUT_MS` map and `withToolTimeout` wrapper in `trix-bots/src/runner/agent-tool-processor.ts`
+- [x] Apply wrapper to each tool execution in the parallel batch (~line 110)
 
 **Current:** `Promise.allSettled()` on parallel tools — one hung tool waits for the full 30s default timeout.
 **Change:**
@@ -90,9 +90,9 @@ function withToolTimeout<T>(promise: Promise<T>, toolName: string): Promise<T> {
 
 ### S1-4: Wrap Run-Completion DB Writes with Retry
 
-- [ ] Import `withRetry` from `failure-recovery.ts` in `trix-bots/src/runner/run-completion.ts`
-- [ ] Wrap the main `agent_runs` UPDATE in `recordRunFailure` with `withRetry`
-- [ ] Wrap the `heartbeat_runs` UPDATE in `recordRunFailure` with `withRetry`
+- [x] Import `withRetry` from `failure-recovery.ts` in `trix-bots/src/runner/run-completion.ts`
+- [x] Wrap the main `agent_runs` UPDATE in `recordRunFailure` with `withRetry`
+- [x] Wrap the `heartbeat_runs` UPDATE in `recordRunFailure` with `withRetry`
 
 **Current:** `recordRunFailure`'s `pg.query()` at line 62 can fail silently, leaving run state inconsistent.
 **Change:**
@@ -114,9 +114,9 @@ await withRetry(
 
 ### S1-5: Persist Circuit Breaker State to Redis
 
-- [ ] Pass Redis client into `CircuitBreaker` constructor in `trix-bots/src/runner/circuit-breaker.ts`
-- [ ] On trip: write expiry timestamp to Redis (`breaker:{toolName}` key with matching TTL)
-- [ ] On check: read from Redis first, fall back to in-memory Map as L1 cache
+- [x] Pass Redis client into `CircuitBreaker` constructor in `trix-bots/src/runner/circuit-breaker.ts`
+- [x] On trip: write expiry timestamp to Redis (`breaker:{toolName}` key with matching TTL)
+- [x] On check: read from Redis first, fall back to in-memory Map as L1 cache
 
 **Current:** In-memory `Map<string, BreakerState>` — resets on every worker restart, re-exposing broken tools.
 **Change:**
@@ -140,10 +140,10 @@ if (expiry && Date.now() < parseInt(expiry)) return true; // still broken
 
 ### S2-1: Parallel Sub-Agent Execution ⭐ Biggest Impact
 
-- [ ] Add `invokeAgentsParallel()` function in `trix-bots/src/runner/agent-invoker.ts`
-- [ ] Add `invoke_agents_parallel` tool definition to the orchestrator tool set
-- [ ] Ensure depth limit check runs before spawning any child in the batch
-- [ ] Verify budget tracking is safe across concurrent children (each gets own `CostTracker`)
+- [x] Add `invokeAgentsParallel()` function in `trix-bots/src/runner/agent-invoker.ts`
+- [x] Add `invoke_agents_parallel` tool definition to the orchestrator tool set
+- [x] Ensure depth limit check runs before spawning any child in the batch
+- [x] Verify budget tracking is safe across concurrent children (each gets own `CostTracker`)
 
 **Current:** All child agent invocations serialize behind a single `concurrencyChain` — N children run one at a time regardless.
 **Change:**
@@ -171,7 +171,7 @@ export async function invokeAgentsParallel(
 
 ### S2-2: Raise Tool Parallelism Cap
 
-- [ ] Change `MAX_PARALLEL` from `5` to `10` in `trix-bots/src/runner/tool-concurrency.ts:32`
+- [x] Change `MAX_PARALLEL` from `5` to `10` in `trix-bots/src/runner/tool-concurrency.ts:32`
 
 **Current:** `MAX_PARALLEL = 5`
 **Notes:** Read-only tools (search, list, get) dominate parallel batches and are lightweight. Monitor with telemetry after rollout.
@@ -180,8 +180,8 @@ export async function invokeAgentsParallel(
 
 ### S2-3: PG Connection Pool Warmup
 
-- [ ] Add `warmPool()` helper in `trix-bots/src/server.ts`
-- [ ] Call `warmPool(pg, Math.min(5, config.pgPoolMax))` after pool is created in startup
+- [x] Add `warmPool()` helper in `trix-bots/src/server.ts`
+- [x] Call `warmPool(pg, Math.min(5, config.pgPoolMax))` after pool is created in startup
 
 **Current:** Pool connections created on-demand — first jobs after a cold start each pay 50–100ms.
 **Change:**
@@ -201,9 +201,9 @@ async function warmPool(pool: Pool, size = 5): Promise<void> {
 
 ### S2-4: Increase PG Pool Size
 
-- [ ] Update pool config in `trix-bots/src/server.ts` to `max: Math.max(40, workerConcurrency * 6)`
-- [ ] Add `idleTimeoutMillis: 30_000` and `connectionTimeoutMillis: 5_000` to both pool configs
-- [ ] Update `trix-api/src/plugins/db.js` pool config with same timeout settings
+- [x] Update pool config in `trix-bots/src/server.ts` to `max: Math.max(40, workerConcurrency * 6)`
+- [x] Add `idleTimeoutMillis: 30_000` and `connectionTimeoutMillis: 5_000` to both pool configs
+- [x] Update `trix-api/src/plugins/db.js` pool config with same timeout settings (already env-var driven in postgres.js)
 
 **Current:** `max: 20` — insufficient when `workerConcurrency = 5` and each job opens 2–3 concurrent queries.
 
@@ -211,9 +211,9 @@ async function warmPool(pool: Pool, size = 5): Promise<void> {
 
 ### S2-5: Cache LLM Re-Ranking Results Per Session
 
-- [ ] Add run-scoped `Map<string, string[]>` cache in `trix-bots/src/memory/llm-reranker.ts`
-- [ ] Key cache by `${runId}:${hash(candidateIds + query)}`
-- [ ] Pass `runId` down from `context-builder.ts:166` to the `rerankMemories()` call
+- [x] Add run-scoped `Map<string, string[]>` cache in `trix-bots/src/memory/llm-reranker.ts`
+- [x] Key cache by `${runId}:${hash(candidateIds + query)}`
+- [x] Pass `runId` down from `context-builder.ts:166` to the `rerankMemories()` call
 
 **Current:** Every retrieval with 6+ candidates fires a fresh Haiku call (~500ms), even for repeated queries in the same run.
 **Change:**
@@ -245,9 +245,9 @@ Prerequisites for diagnosing everything that follows.
 
 ### S3-1: Error Type on Tool Spans
 
-- [ ] Extend `ToolSpan` interface in `trix-bots/src/runner/span-telemetry.ts` with `error_type`, `error_message`, `retry_count`
-- [ ] Add `classifyToolError()` function in `trix-bots/src/runner/agent-tool-processor.ts`
-- [ ] Pass classified error type when recording failed tool spans
+- [x] Extend `ToolSpan` interface in `trix-bots/src/runner/span-telemetry.ts` with `error_type`, `error_message`, `retry_count`
+- [x] Add `classifyToolError()` function in `trix-bots/src/runner/agent-tool-processor.ts`
+- [x] Pass classified error type when recording failed tool spans
 
 **Current:** `ToolSpan` has `success: boolean` only — can't distinguish timeout from auth failure post-hoc.
 **Change:**
@@ -277,10 +277,10 @@ function classifyToolError(err: Error): ToolSpan['error_type'] {
 
 ### S3-2: Audit Storage Retry + Dead-Letter Queue
 
-- [ ] Write migration: `CREATE TABLE audit_dlq (id uuid PK, run_id uuid, agent_id uuid, entries jsonb, failed_at timestamptz)`
-- [ ] Wrap `trix.memories.batchStore()` call in `trix-bots/src/runner/audit-log.ts:118` with `withRetry`
-- [ ] On final failure, INSERT to `audit_dlq` via pg with fire-and-forget catch
-- [ ] Add log line at error level when audit entry sent to DLQ
+- [x] Write migration: `CREATE TABLE audit_dlq (id uuid PK, run_id uuid, agent_id uuid, entries jsonb, failed_at timestamptz)`
+- [x] Wrap `trix.memories.batchStore()` call in `trix-bots/src/runner/audit-log.ts:118` with `withRetry`
+- [x] On final failure, INSERT to `audit_dlq` via pg with fire-and-forget catch
+- [x] Add log line at error level when audit entry sent to DLQ
 
 **Current:** `storeAuditLog()` swallows all errors — high-risk action audits can be permanently lost.
 
@@ -288,9 +288,9 @@ function classifyToolError(err: Error): ToolSpan['error_type'] {
 
 ### S3-3: Emit Denied-Action Audit Entries
 
-- [ ] Call `auditLog?.record()` in `trix-bots/src/runner/guardrail-engine.ts` when a tool is blocked
-- [ ] Call `auditLog?.record()` in `trix-bots/src/runner/approval-gate.ts` when a tool is denied
-- [ ] Set `denied: true, success: false, denialReason: 'guardrail_blocked' | 'user_denied'` on these entries
+- [x] Call `auditLog?.record()` in `trix-bots/src/runner/guardrail-engine.ts` when a tool is blocked
+- [x] Call `auditLog?.record()` in `trix-bots/src/runner/approval-gate.ts` when a tool is denied
+- [x] Set `denied: true, success: false, denialReason: 'guardrail_blocked' | 'user_denied'` on these entries
 
 **Current:** `guardrail_blocked` and approval denials fire as step events but never appear in audit reports.
 
@@ -298,10 +298,10 @@ function classifyToolError(err: Error): ToolSpan['error_type'] {
 
 ### S3-4: Cost Bucketing in Activity Timeline
 
-- [ ] Add `cost_usd` column to `run_buckets` CTE in `trix-api/src/routes/agent-runs.js:258`
-- [ ] Add `COALESCE(SUM(rb.cost_usd), 0) AS cost_usd_total` to the outer SELECT
-- [ ] Return `cost_usd: parseFloat(row.cost_usd_total)` in the bucket response objects
-- [ ] Update `totals` accumulator to sum `cost_usd` across buckets
+- [x] Add `cost_usd` column to `run_buckets` CTE in `trix-api/src/routes/agent-runs.js:258`
+- [x] Add `COALESCE(SUM(rb.cost_usd), 0) AS cost_usd_total` to the outer SELECT
+- [x] Return `cost_usd: parseFloat(row.cost_usd_total)` in the bucket response objects
+- [x] Update `totals` accumulator to sum `cost_usd` across buckets
 
 **Current:** Timeline buckets show run counts only — can't see when expensive runs happened.
 
@@ -309,8 +309,8 @@ function classifyToolError(err: Error): ToolSpan['error_type'] {
 
 ### S3-5: Real-Time cost_exceeded / guardrail Redis Events
 
-- [ ] In `trix-bots/src/worker-events.ts`, after writing a step event, check if type is `cost_exceeded` or `guardrail_blocked`
-- [ ] Publish a dedicated `agent.run.cost_exceeded` / `agent.run.guardrail_blocked` run event alongside the step event
+- [x] In `trix-bots/src/worker-events.ts`, after writing a step event, check if type is `cost_exceeded` or `guardrail_blocked`
+- [x] Publish a dedicated `agent.run.cost_exceeded` / `agent.run.guardrail_blocked` run event alongside the step event
 
 **Current:** These fire as generic step events — subscribers can't react in real-time to cap hits.
 **Change:**
@@ -335,10 +335,10 @@ if (event.type === 'cost_exceeded' || event.type === 'guardrail_blocked') {
 
 ### S4-1: Per-Child Budget Caps
 
-- [ ] Add `max_budget_usd?: number` to the `agent_invoke` tool schema
-- [ ] In `trix-bots/src/runner/agent-invoker.ts`, read remaining budget from parent `CostTracker` before spawning
-- [ ] Cap child budget at `min(invocation.maxBudgetUsd, remainingBudget * 0.5)`
-- [ ] Throw early if cap ≤ 0 with a clear "Insufficient budget to spawn sub-agent" error
+- [x] Add `max_budget_usd?: number` to the `agent_invoke` tool schema
+- [x] In `trix-bots/src/runner/agent-invoker.ts`, read remaining budget from parent `CostTracker` before spawning
+- [x] Cap child budget at `min(invocation.maxBudgetUsd, remainingBudget * 0.5)`
+- [x] Throw early if cap ≤ 0 with a clear "Insufficient budget to spawn sub-agent" error
 
 **Current:** Only account-level budget enforced — a runaway child can exhaust all remaining budget.
 **Notes:** The 50% cap prevents a single child from consuming all remaining budget. Parent retains 50% for completion work.
@@ -347,43 +347,43 @@ if (event.type === 'cost_exceeded' || event.type === 'guardrail_blocked') {
 
 ### S4-2: Conditional Pipeline Stages
 
-- [ ] Add `condition?: (fromStages: Readonly<Record<string, unknown>>) => boolean` to `Stage` interface in `trix-bots/src/pipelines/types.ts`
-- [ ] In `trix-bots/src/pipelines/runner.ts`, check `stage.condition` before executing; record `{ skipped: true }` if false
-- [ ] Add tests for conditional skip behavior
+- [x] Add `condition?: (fromStages: Readonly<Record<string, unknown>>) => boolean` to `Stage` interface in `trix-bots/src/pipelines/types.ts`
+- [x] In `trix-bots/src/pipelines/runner.ts`, check `stage.condition` before executing; record `{ skipped: true }` if false
+- [x] Add tests for conditional skip behavior
 
 **Current:** All stages defined upfront and always executed if dependencies satisfied.
 **Notes:** Non-breaking — stages without `condition` behave exactly as before.
 
 ---
 
-### S4-3: Workflow FSM Entry/Exit Hooks
+### S4-3: Workflow FSM Entry/Exit Hooks ✅
 
-- [ ] Add `onEntry?` and `onExit?` hook signatures to `Phase` interface in `trix-bots/src/runner/workflow-fsm.ts`
-- [ ] Call `currentPhase.onExit(state, nextPhaseName)` before transitioning
-- [ ] Call `nextPhase.onEntry(state)` after transitioning
-- [ ] Make hooks async; await them in sequence
+- [x] Add `onEntry?` and `onExit?` hook signatures to `Phase` interface in `trix-bots/src/runner/workflow-fsm.ts`
+- [x] Call `currentPhase.onExit(state, nextPhaseName)` before transitioning
+- [x] Call `nextPhase.onEntry(state)` after transitioning
+- [x] Make hooks async; await them in sequence
 
 **Current:** Phases only control tool availability — no side effects on phase transitions.
 
 ---
 
-### S4-4: FSM Phase-Local State
+### S4-4: FSM Phase-Local State ✅
 
-- [ ] Add `phaseState: Record<string, unknown>` to `WorkflowFSMState` in `trix-bots/src/runner/workflow-fsm.ts:53`
-- [ ] Add `phaseHistory: Array<{ phase: string; state: Record<string, unknown>; exitedAt: number }>` to state
-- [ ] On phase transition, move `phaseState` snapshot to `phaseHistory` entry, then clear `phaseState`
-- [ ] Expose `set_phase_state` as a tool available within FSM-governed runs
+- [x] Add `phaseState: Record<string, unknown>` to `WorkflowFSMState` in `trix-bots/src/runner/workflow-fsm.ts:53`
+- [x] Add `phaseHistory: Array<{ phase: string; state: Record<string, unknown>; exitedAt: number }>` to state
+- [x] On phase transition, move `phaseState` snapshot to `phaseHistory` entry, then clear `phaseState`
+- [x] Expose `set_phase_state` as a tool available within FSM-governed runs
 
 **Current:** Phases accumulate no data — each turn starts fresh with no carry-over.
 
 ---
 
-### S4-5: Dynamic Pipeline Stage Count (Fan-Out)
+### S4-5: Dynamic Pipeline Stage Count (Fan-Out) ✅
 
-- [ ] Add `dynamic?: { countFn, stageFactory }` to `Stage` interface in `trix-bots/src/pipelines/types.ts`
-- [ ] In `trix-bots/src/pipelines/runner.ts`, expand dynamic stages before layer execution using `countFn` + `stageFactory`
-- [ ] Collect results under `{stageName}_{index}` keys in `fromStages`
-- [ ] Add tests for fan-out then merge patterns
+- [x] Add `dynamic?: { countFn, stageFactory }` to `Stage` interface in `trix-bots/src/pipelines/types.ts`
+- [x] In `trix-bots/src/pipelines/runner.ts`, expand dynamic stages before layer execution using `countFn` + `stageFactory`
+- [x] Collect results under `{stageName}_{index}` keys in `fromStages`
+- [x] Add tests for fan-out then merge patterns
 
 **Current:** Stage count is fixed at DAG definition time — no runtime fan-out.
 
@@ -393,54 +393,54 @@ if (event.type === 'cost_exceeded' || event.type === 'guardrail_blocked') {
 
 ---
 
-### S5-1: Per-Source Injection Budget Reservations
+### S5-1: Per-Source Injection Budget Reservations ✅
 
-- [ ] Define `BudgetReservations` interface in `trix-bots/src/memory/budget-governor.ts`
-- [ ] Partition incoming memories by type tag before applying budget caps
-- [ ] Apply independent caps: `{ memories: 10_000, rules: 1_000, reflections: 1_500 }` (total ~12k, same as before)
-- [ ] Wire partitioned results into `context-builder.ts` assembly
+- [x] Define `BudgetReservations` interface in `trix-bots/src/memory/budget-governor.ts`
+- [x] Partition incoming memories by type tag before applying budget caps
+- [x] Apply independent caps: `{ memories: 10_000, rules: 1_000, reflections: 1_500 }` (total ~12.5k)
+- [x] Wire partitioned results into `sdk/query.ts` assembly
 
 **Current:** All memories compete in a single 12k-char pool — agent learnings can starve conversation context.
 
 ---
 
-### S5-2: Graduated Memory Reinforcement
+### S5-2: Graduated Memory Reinforcement ✅
 
-- [ ] Track `citation_count` in memory metadata, increment on each citation in `trix-bots/src/memory/consolidation.ts`
-- [ ] Compute `citationBoost = Math.min(1 + 0.1 * citationCount, 2.0)` and apply to strength on reinforce
-- [ ] Cap final strength at 1.0
+- [x] Track `citation_count` in memory metadata, increment on each citation in `trix-bots/src/memory/consolidation.ts`
+- [x] Compute `citationBoost = Math.min(1 + 0.1 * citationCount, 2.0)` and apply to strength on reinforce
+- [x] Cap final strength at 1.0
 
 **Current:** Cited memories get a uniform boost — 10 citations vs 1 treated identically.
 
 ---
 
-### S5-3: Threshold-Triggered Consolidation
+### S5-3: Threshold-Triggered Consolidation ✅
 
-- [ ] In `trix-bots/src/memory/budget-governor.ts`, count memories dropped per call
-- [ ] If `droppedCount > 3`, call `triggerEpisodicConsolidation()` via `setImmediate` (non-blocking)
-- [ ] Verify `triggerEpisodicConsolidation` in `memory-consolidator.ts` is safe to call concurrently
+- [x] In `trix-bots/src/memory/budget-governor.ts`, count memories dropped per call
+- [x] If `droppedCount > 3`, call `onBudgetOverflow()` via `setImmediate` (non-blocking)
+- [x] Caller-injectable callback — safe for concurrent use, non-blocking
 
 **Current:** Consolidation only runs on a fixed schedule — budget overflows happen without triggering rollup.
 
 ---
 
-### S5-4: Session Checkpoint Versioning
+### S5-4: Session Checkpoint Versioning ✅
 
-- [ ] Define `CHECKPOINT_VERSION = 2` constant in `trix-bots/src/runner/session-recovery.ts`
-- [ ] Wrap all checkpoint writes in `{ version: CHECKPOINT_VERSION, createdAt: Date.now(), state: ... }`
-- [ ] Add `migrateCheckpoint(old)` function that fills defaults for any missing v2 fields
-- [ ] On read, check version and migrate if older
+- [x] Define `CHECKPOINT_VERSION = 2` constant in `trix-bots/src/runner/session-recovery.ts`
+- [x] Wrap all checkpoint writes in `{ version: CHECKPOINT_VERSION, createdAt: Date.now(), state: ... }`
+- [x] Add `migrateCheckpoint(old)` function that fills defaults for any missing v2 fields
+- [x] On read, check version and migrate if older
 
 **Current:** No version header — schema changes silently use defaults on old checkpoints.
 
 ---
 
-### S5-5: Adaptive Context Boundary Detection (Loop Collapse)
+### S5-5: Adaptive Context Boundary Detection (Loop Collapse) ✅
 
-- [ ] Add `detectToolLoops(messages)` in `trix-bots/src/runner/smart-compressor.ts`
-- [ ] Detect runs of 5+ consecutive calls to the same tool
-- [ ] Replace detected loop spans with a single summary message before passing to compactor
-- [ ] Add tests for loop detection edge cases (interrupted loops, interleaved tools)
+- [x] Add `detectToolLoops(messages)` in `trix-bots/src/runner/smart-compressor.ts`
+- [x] Detect runs of 5+ consecutive calls to the same tool
+- [x] Replace detected loop spans with a single summary message before passing to compactor
+- [x] Add tests for loop detection edge cases (interrupted loops, interleaved tools)
 
 **Current:** Static `DEFAULT_TAIL_RATIO = 0.2` — repeated identical tool calls are compacted individually.
 
@@ -450,67 +450,67 @@ if (event.type === 'cost_exceeded' || event.type === 'guardrail_blocked') {
 
 ---
 
-### P3-1: Dead-Letter Queue for Failed BullMQ Jobs
+### P3-1: Dead-Letter Queue for Failed BullMQ Jobs ✅
 
-- [ ] Write migration: `CREATE TABLE dead_letter_runs (id uuid PK, run_id uuid, agent_id uuid, job_data jsonb, failed_at timestamptz, error_message text)`
-- [ ] In BullMQ `failed` event handler (`trix-bots/src/worker.ts`), INSERT job data to `dead_letter_runs` before BullMQ removes the job
-- [ ] Add `GET /agents/runs/dead-letter` endpoint for inspection
+- [x] Write migration: `CREATE TABLE dead_letter_runs (id uuid PK, run_id uuid, agent_id uuid, job_data jsonb, failed_at timestamptz, error_message text)`
+- [x] In BullMQ `failed` event handler (`trix-bots/src/worker.ts`), INSERT job data to `dead_letter_runs` before BullMQ removes the job
+- [x] Add `GET /agents/runs/dead-letter` endpoint for inspection
 
 ---
 
-### P3-2: Increase Orchestrator Depth Limit (3 → 6)
+### P3-2: Increase Orchestrator Depth Limit (3 → 6) ✅
 
-- [ ] Change `MAX_ORCHESTRATOR_DEPTH` in `trix-bots/src/runner/orchestrator.ts`
-- [ ] Add cost-aware depth guard: deeper nesting requires proportionally larger remaining budget
-- [ ] Add warning log at depth ≥ 4 so runaway recursion is visible
+- [x] Change `MAX_ORCHESTRATOR_DEPTH` in `trix-bots/src/runner/orchestrator.ts`
+- [x] Add cost-aware depth guard: deeper nesting requires proportionally larger remaining budget
+- [x] Add warning log at depth ≥ 4 so runaway recursion is visible
 
 ---
 
 ### P3-3: Structured Handoff Artifacts
 
-- [ ] Extend `HandoffContext.artifacts` in `trix-bots/src/runner/handoff-protocol.ts` with binary/structured data support
-- [ ] Add bidirectional ACK field: `acknowledged: boolean; acknowledgedAt?: number` to `PeerDelegation`
-- [ ] Add automatic diff summarization for file-change handoffs
+- [x] Extend `HandoffContext.artifacts` in `trix-bots/src/runner/handoff-protocol.ts` with binary/structured data support
+- [x] Add bidirectional ACK field: `acknowledged: boolean; acknowledgedAt?: number` to `PeerDelegation`
+- [x] Add automatic diff summarization for file-change handoffs
 
 ---
 
 ### P3-4: Approximate Citation Matching
 
-- [ ] Replace O(n×m) substring scan in `trix-bots/src/memory/citation-observer.ts` with rolling suffix array approach
-- [ ] Add Levenshtein distance check (threshold 0.9) for near-paraphrase detection
-- [ ] Make quote threshold adaptive: shorter memories → lower threshold (10 chars), longer → higher (30 chars)
+- [x] Replace O(n×m) substring scan in `trix-bots/src/memory/citation-observer.ts` with rolling suffix array approach
+- [x] Add Levenshtein distance check (threshold 0.9) for near-paraphrase detection
+- [x] Make quote threshold adaptive: shorter memories → lower threshold (10 chars), longer → higher (30 chars)
 
 ---
 
 ### P3-5: Heartbeat Run Redis Notifications
 
-- [ ] Emit `heartbeat:run_started` event in `trix-bots/src/worker-events.ts` when `trigger_type === 'heartbeat'`
-- [ ] Emit `heartbeat:run_completed` / `heartbeat:run_failed` on completion
-- [ ] Update `trix-api/src/routes/agent-runs.js` timeline to optionally include heartbeat buckets
+- [x] Emit `heartbeat:run_started` event in `trix-bots/src/worker-events.ts` when `trigger_type === 'heartbeat'`
+- [x] Emit `heartbeat:run_completed` / `heartbeat:run_failed` on completion
+- [x] Update `trix-api/src/routes/agent-runs.js` timeline to optionally include heartbeat buckets
 
 ---
 
 ### P3-6: Idempotency Cache Persistence
 
-- [ ] Add `idempotencyCache: Record<string, boolean>` field to `SessionCheckpoint` in `trix-bots/src/runner/session-recovery.ts`
-- [ ] Serialize/deserialize cache in `IdempotencyTracker` (`runner/idempotency.ts`) via checkpoint save/load
-- [ ] Bound serialized cache size (cap at last 200 entries)
+- [x] Add `idempotencyCache: Record<string, boolean>` field to `SessionCheckpoint` in `trix-bots/src/runner/session-recovery.ts`
+- [x] Serialize/deserialize cache in `IdempotencyTracker` (`runner/idempotency.ts`) via checkpoint save/load
+- [x] Bound serialized cache size (cap at last 200 entries)
 
 ---
 
 ### P3-7: Batch Trix API Memory Fetches
 
-- [ ] Design `/v1/memories/batch-query` endpoint in `trix-api` accepting array of `{ query, spaceId, limit }` requests
-- [ ] Update `trix-bots/src/memory/retrieval.ts` to use batch endpoint when available
-- [ ] Eliminates 7 sequential API round-trips per agent turn in `context-builder.ts:53-97`
+- [x] Design `/v1/memories/batch-query` endpoint in `trix-api` accepting array of `{ query, spaceId, limit }` requests
+- [x] Update `trix-bots/src/memory/retrieval.ts` to use batch endpoint when available
+- [x] Eliminates 7 sequential API round-trips per agent turn in `context-builder.ts:53-97`
 
 ---
 
 ### P3-8: Cost Prediction Before LLM Call
 
-- [ ] Add token-count helper (messages + tool definitions) in `trix-bots/src/runner/agent-runner-llm.ts`
-- [ ] Before calling LLM, estimate token cost and compare against remaining budget
-- [ ] Abort with `cost_exceeded` status (not error) if predicted cost exceeds remaining budget
+- [x] Add token-count helper (messages + tool definitions) in `trix-bots/src/runner/agent-runner-llm.ts`
+- [x] Before calling LLM, estimate token cost and compare against remaining budget
+- [x] Abort with `cost_exceeded` status (not error) if predicted cost exceeds remaining budget
 
 ---
 
