@@ -1,0 +1,63 @@
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e6]:
+    - navigation [ref=e7]:
+      - generic [ref=e8]:
+        - button "Chat" [ref=e9] [cursor=pointer]:
+          - img [ref=e10]
+        - button "Feed" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+        - button "Notes" [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+        - button "Tasks" [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+        - button "Notifications" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+        - button "Habits" [pressed] [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+        - button "Goals" [ref=e27] [cursor=pointer]:
+          - img [ref=e28]
+        - toolbar "Hub list" [ref=e30]:
+          - separator [ref=e31]
+          - button "Activity Tracker App" [ref=e32] [cursor=pointer]:
+            - generic [ref=e34]: A
+          - button "Expand Folder" [ref=e35] [cursor=pointer]
+          - button "Create hub" [ref=e37] [cursor=pointer]:
+            - img [ref=e38]
+      - generic [ref=e40]:
+        - button "Toolbox" [ref=e41] [cursor=pointer]:
+          - img [ref=e42]
+        - button "Settings" [ref=e44] [cursor=pointer]:
+          - img [ref=e47]
+    - main [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - heading "Habits" [level=1] [ref=e53]
+          - button "+ New" [ref=e54] [cursor=pointer]
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - generic [ref=e57]: 0 / 3 completed today
+            - tablist [ref=e58]:
+              - tab "Show all habits" [selected] [ref=e59] [cursor=pointer]: All
+              - tab "Show active habits" [ref=e60] [cursor=pointer]: Active
+              - tab "Show paused habits" [ref=e61] [cursor=pointer]: Paused
+          - generic [ref=e62]:
+            - generic "Test Habit, No streak, not completed" [ref=e63]:
+              - button "Mark complete" [ref=e64] [cursor=pointer]
+              - button "View Test Habit details" [ref=e65] [cursor=pointer]:
+                - generic [ref=e66]:
+                  - generic "Test Habit" [ref=e67]
+                  - generic [ref=e69]: daily
+            - generic "Verify Habit 2, No streak, not completed" [ref=e70]:
+              - button "Mark complete" [ref=e71] [cursor=pointer]
+              - button "View Verify Habit 2 details" [ref=e72] [cursor=pointer]:
+                - generic [ref=e73]:
+                  - generic "Verify Habit 2" [ref=e74]
+                  - generic [ref=e76]: daily
+            - generic "Sync Test Habit, No streak, not completed" [ref=e77]:
+              - button "Mark complete" [ref=e78] [cursor=pointer]
+              - button "View Sync Test Habit details" [ref=e79] [cursor=pointer]:
+                - generic [ref=e80]:
+                  - generic "Sync Test Habit" [ref=e81]
+                  - generic [ref=e83]: daily
