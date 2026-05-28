@@ -40,6 +40,19 @@ Key constraints:
 
 Each subproject has its own CLAUDE.md with specific instructions. When working in a subproject, also check its local CLAUDE.md for project-specific commands and patterns.
 
+## Submodules
+
+All subprojects are git submodules. For day-to-day operations (cloning, bumping
+pointers, syncing) see [SUBMODULES.md](./SUBMODULES.md). Key quirks to remember:
+
+- **`shannon`** is a fork of `KeygraphHQ/shannon`. Our adapted version lives
+  on the `trix/main` branch of `trixdb/shannon`; the fork's `main` mirrors
+  upstream. Never push to the fork's `main` directly — push to `trix/main`.
+- **`trix-landing`** is a legacy gitlink not registered in `.gitmodules` —
+  clone it manually if missing after a fresh checkout.
+- **`trix-sdk-typescript`** and **`trix-workers-node`** have failing pre-push
+  hooks (tracked separately). Push with `--no-verify` until fixed.
+
 ## Screenshots
 
 Always save screenshots to the `screenshots/` directory, never the repo root. Examples:

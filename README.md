@@ -15,6 +15,11 @@ trix/
 └── trixdb-workers-node/  # Background workers (Node.js/BullMQ)
 ```
 
+> **Working with submodules?** See [SUBMODULES.md](./SUBMODULES.md) for the full
+> inventory, day-to-day commands (clone, bump, sync), the special-case fork
+> setup for `shannon`, and known quirks (e.g. `trix-landing` is a legacy
+> gitlink, `.playwright-cli/` should be globally ignored).
+
 ## Components
 
 ### [trixdb](./trixdb)
