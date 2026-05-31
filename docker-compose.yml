@@ -187,7 +187,7 @@ services:
     env_file:
       - .env.local
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       HOST: 0.0.0.0
       PORT: 3737
       DATABASE_URL: postgres://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
@@ -239,7 +239,7 @@ services:
     env_file:
       - .env.local
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       REDIS_HOST: valkey
       REDIS_PORT: 6379
       DATABASE_URL: postgresql://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
