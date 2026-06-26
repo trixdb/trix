@@ -4,6 +4,16 @@
 
 TrixDB is a multi-tenant memory management system with vector embeddings, semantic search, relationship mapping, and MCP (Model Context Protocol) integration.
 
+> **New here? Start with [docs/architecture/](./docs/architecture/README.md)** — a
+> cross-cutting map of the **memory pipeline** and **agentic pipeline**, how the
+> repos divide responsibility, a glossary of overloaded terms, and a
+> [register of what's broken/dead/unwired pre-launch](./docs/architecture/KNOWN_GAPS_PRELAUNCH.md).
+>
+> ⚠️ The "Repository Structure" and "Features" sections below are **stale** (old
+> `trixdb-*` directory names, "19+ MCP tools" — actual 280+, missing several
+> components). Trust `docs/architecture/` and `SUBMODULES.md` over this file until
+> it is refreshed.
+
 ## Repository Structure
 
 ```
