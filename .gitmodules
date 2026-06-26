@@ -10,7 +10,7 @@
 	url = git@github.com:trixdb/trix-api.git
 [submodule "trix-app"]
 	path = trix-app
-	url = git@github.com:devghost/trix-app.git
+	url = git@github.com:trixdb/trix-app.git
 [submodule "trix-bots"]
 	path = trix-bots
 	url = git@github.com:trixdb/trix-bots.git
@@ -40,7 +40,7 @@
 	url = git@github.com:trixdb/trix-sdk-csharp-examples.git
 [submodule "trix-sdk-go"]
 	path = trix-sdk-go
-	url = git@github.com:devghost/trix-sdk-go.git
+	url = git@github.com:trixdb/trix-sdk-go.git
 [submodule "trix-sdk-python"]
 	path = trix-sdk-python
 	url = git@github.com:trixdb/trix-sdk-python.git

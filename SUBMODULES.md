@@ -136,9 +136,9 @@ gh pr create --repo KeygraphHQ/shannon --base main
   Previously only `trix-bots` was registered, so the other ~20 (including
   `trix-landing`) had to be cloned by hand — no longer necessary.
 
-- **`trix-app`** and **`trix-sdk-go`** live under the `devghost` org
-  (`git@github.com:devghost/…`), not `trixdb`. You need access to that org for
-  `--init` to clone them; everything else is under `trixdb`.
+- **All submodules are under the `trixdb` org.** (`trix-app` and `trix-sdk-go`
+  were migrated from `devghost` → `trixdb` on 2026-06-26.) `trix-app` is a
+  private repo, so you need `trixdb`-org access to clone it.
 
 - **`shannon`** is registered with `branch = trix/main` (our adapted fork
   branch). `git submodule update --init` checks out the superproject-pinned
