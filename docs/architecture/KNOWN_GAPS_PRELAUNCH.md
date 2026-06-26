@@ -224,7 +224,7 @@ route-by-route status. The headline gaps:
 | 34 | **`agent_cost_*` tables type `agent_id` as VARCHAR(256), no FK** (rest of schema uses UUID+FK) | `20260627000000_agent_cost_protection.js:15` |
 | 35 | **Doc/code drift**: `orchestrator.ts:6` says "max 3 levels" but `MAX_ORCHESTRATOR_DEPTH=6`; `trix-bots/CLAUDE.md` says `bot-execution` (actual `agent-execution`) | `lib/constants.ts:7,171` |
 | 36 | **Stub side-effects**: Magic Doc auto-update is dry-run only (`agent-runner.ts:476-507`); `deps.maxTurns` vestigial; `tool_batch_summary` emit commented out | as cited |
-| 37 | ✅ **Submodule reality**: only `trix-bots` is registered in `.gitmodules`; ~21 gitlinks exist (incl. shannon, trix-api, trix-research, trix-workers-node, trix-sdk-go, install.trixdb.com). `git submodule update --init` won't clone them. CLAUDE.md/SUBMODULES.md claim only `trix-landing` is unregistered — inaccurate | `.gitmodules`; `git ls-tree HEAD` |
+| 37 | ✅ **FIXED (2026-06-26)**: all 21 gitlinks are now registered in `.gitmodules` (was: only `trix-bots`), so `git submodule update --init --recursive` clones everything. `shannon` pinned to `branch = trix/main`; `trix-app`/`trix-sdk-go` are under the `devghost` org | `.gitmodules` |
 | 38 | **shannon**: hardcoded throwaway pentest creds committed (`configs/trix-api.yaml:8-9`); agents run `bypassPermissions`/`maxTurns 10_000` with no guard against pointing at a real env | `claude-executor.ts:244-246` |
 
 ## Open questions for the team
