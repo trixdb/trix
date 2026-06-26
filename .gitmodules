@@ -1,3 +1,64 @@
+[submodule "install.trixdb.com"]
+	path = install.trixdb.com
+	url = git@github.com:trixdb/install.trixdb.com.git
+[submodule "shannon"]
+	path = shannon
+	url = git@github.com:trixdb/shannon.git
+	branch = trix/main
+[submodule "trix-api"]
+	path = trix-api
+	url = git@github.com:trixdb/trix-api.git
+[submodule "trix-app"]
+	path = trix-app
+	url = git@github.com:devghost/trix-app.git
 [submodule "trix-bots"]
 	path = trix-bots
 	url = git@github.com:trixdb/trix-bots.git
+[submodule "trix-cli-admin"]
+	path = trix-cli-admin
+	url = git@github.com:trixdb/trix-cli-admin.git
+[submodule "trix-cli-go"]
+	path = trix-cli-go
+	url = git@github.com:trixdb/trix-cli-go.git
+[submodule "trix-daemon"]
+	path = trix-daemon
+	url = git@github.com:trixdb/trix-daemon.git
+[submodule "trix-landing"]
+	path = trix-landing
+	url = git@github.com:trixdb/trix-landing.git
+[submodule "trix-mcp"]
+	path = trix-mcp
+	url = git@github.com:trixdb/trix-mcp.git
+[submodule "trix-research"]
+	path = trix-research
+	url = git@github.com:trixdb/trix-research.git
+[submodule "trix-sdk-csharp"]
+	path = trix-sdk-csharp
+	url = git@github.com:trixdb/trix-sdk-csharp.git
+[submodule "trix-sdk-csharp-examples"]
+	path = trix-sdk-csharp-examples
+	url = git@github.com:trixdb/trix-sdk-csharp-examples.git
+[submodule "trix-sdk-go"]
+	path = trix-sdk-go
+	url = git@github.com:devghost/trix-sdk-go.git
+[submodule "trix-sdk-python"]
+	path = trix-sdk-python
+	url = git@github.com:trixdb/trix-sdk-python.git
+[submodule "trix-sdk-python-examples"]
+	path = trix-sdk-python-examples
+	url = git@github.com:trixdb/trix-sdk-python-examples.git
+[submodule "trix-sdk-typescript"]
+	path = trix-sdk-typescript
+	url = git@github.com:trixdb/trix-sdk-typescript.git
+[submodule "trix-sdk-typescript-examples"]
+	path = trix-sdk-typescript-examples
+	url = git@github.com:trixdb/trix-sdk-typescript-examples.git
+[submodule "trix-visual-embeddings"]
+	path = trix-visual-embeddings
+	url = git@github.com:trixdb/trix-visual-embeddings.git
+[submodule "trix-workers"]
+	path = trix-workers
+	url = git@github.com:trixdb/trix-workers.git
+[submodule "trix-workers-node"]
+	path = trix-workers-node
+	url = git@github.com:trixdb/trix-workers-node.git

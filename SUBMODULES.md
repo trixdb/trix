@@ -128,13 +128,21 @@ gh pr create --repo KeygraphHQ/shannon --base main
 
 ## Known submodule quirks
 
-- **`trix-landing`** is NOT registered in `.gitmodules` — it's a legacy gitlink
-  (mode 160000) pointing at `trixdb/trix-landing`. Works fine but won't be
-  picked up by `git submodule update --init` without explicit handling. Clone
-  it manually if missing:
+- **All gitlinks are now registered in `.gitmodules`** (as of 2026-06-26). A
+  fresh checkout clones everything with one command:
   ```bash
-  git clone git@github.com:trixdb/trix-landing.git
+  git submodule update --init --recursive
   ```
+  Previously only `trix-bots` was registered, so the other ~20 (including
+  `trix-landing`) had to be cloned by hand — no longer necessary.
+
+- **`trix-app`** and **`trix-sdk-go`** live under the `devghost` org
+  (`git@github.com:devghost/…`), not `trixdb`. You need access to that org for
+  `--init` to clone them; everything else is under `trixdb`.
+
+- **`shannon`** is registered with `branch = trix/main` (our adapted fork
+  branch). `git submodule update --init` checks out the superproject-pinned
+  commit; `git submodule update --remote shannon` follows `trix/main`.
 
 - **`trix-sdk-typescript`** has 4 known failing tests in `tests/github.test.ts`
   that block its pre-push hook. Until fixed, push with `--no-verify`.
