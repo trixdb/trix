@@ -48,10 +48,9 @@ pointers, syncing) see [SUBMODULES.md](./SUBMODULES.md). Key quirks to remember:
 - **`shannon`** is a fork of `KeygraphHQ/shannon`. Our adapted version lives
   on the `trix/main` branch of `trixdb/shannon`; the fork's `main` mirrors
   upstream. Never push to the fork's `main` directly — push to `trix/main`.
-- **All gitlinks are registered in `.gitmodules`** (since 2026-06-26), so a
-  fresh checkout works with `git submodule update --init --recursive`.
-  Note: **`trix-app`** and **`trix-sdk-go`** are hosted under the `devghost`
-  org (not `trixdb`) — you need access to it for those two to clone.
+- **All gitlinks are registered in `.gitmodules`** (since 2026-06-26) and all
+  live under the `trixdb` org, so a fresh checkout works with
+  `git submodule update --init --recursive`.
 - **`trix-sdk-typescript`** and **`trix-workers-node`** have failing pre-push
   hooks (tracked separately). Push with `--no-verify` until fixed.
 
