@@ -62,3 +62,6 @@
 [submodule "trix-workers-node"]
 	path = trix-workers-node
 	url = git@github.com:trixdb/trix-workers-node.git
+[submodule "trix-embeddings"]
+	path = trix-embeddings
+	url = git@github.com:trixdb/trix-embeddings.git
