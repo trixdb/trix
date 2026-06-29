@@ -27,8 +27,8 @@ pattern.
 | `trix-sdk-typescript-examples` | `trixdb/trix-sdk-typescript-examples` | TypeScript example apps |
 | `trix-settings` | `trixdb/trix-settings` | Wails v2 desktop settings app |
 | `trix-visual-embeddings` | `trixdb/trix-visual-embeddings` | SigLIP 2 embedding service |
-| `trix-workers` | `trixdb/trix-workers` | Background workers (Python) |
-| `trix-workers-node` | `trixdb/trix-workers-node` | Background workers (Node/BullMQ) |
+| `trix-workers` | `trixdb/trix-workers` | Active Python/taskiq ML workers — HDBSCAN clustering, cluster-ops, community/anomaly detection, temporal patterns, replay (load-bearing, not legacy) |
+| `trix-workers-node` | `trixdb/trix-workers-node` | Node/BullMQ I/O workers (transcription, embeddings, integrations, billing); *bridges* clustering/cluster-ops to `trix-workers` |
 
 ## Day-to-day operations
 
@@ -149,6 +149,16 @@ gh pr create --repo KeygraphHQ/shannon --base main
 
 - **`trix-workers-node`** pre-push hook flags coverage / lint / security
   thresholds. Push with `--no-verify` until those are addressed separately.
+
+- **`trix-workers` (Python) and `trix-workers-node` (Node) are complementary,
+  not redundant.** `trix-workers-node` handles I/O (transcription, embeddings,
+  integrations, billing) and the consolidation/decay cycle, but only *bridges*
+  clustering and cluster-ops to `trix-workers` — it writes a `pending` row that
+  the Python service polls and computes with HDBSCAN. `trix-workers` is the
+  load-bearing ML complement (clustering, community/anomaly detection, temporal
+  patterns, replay). Both are deployed and online in prod; **disabling
+  `trix-workers` strands clustering/cluster-ops as `pending` forever — don't
+  turn it off.**
 
 - **`.playwright-cli/`** session caches (browser snapshots from agent runs)
   should be in every submodule's `.gitignore`. The trix-bots repo previously
