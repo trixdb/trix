@@ -24,8 +24,8 @@ Key constraints:
 | `trix-sdk-python` | Python SDK — 27 domains, production-ready |
 | `trix-sdk-typescript` | TypeScript SDK — 31 endpoints, production-ready |
 | `trix-sdk-csharp` | .NET SDK (NuGet: Trix.Client) |
-| `trix-workers-node` | Background workers (BullMQ) — 52 processors |
-| `trix-workers` | Legacy background workers (decay, consolidation, clustering) |
+| `trix-workers-node` | Node/BullMQ workers — I/O + coordination (transcription, embeddings, integrations, billing); **bridges clustering/cluster-ops to `trix-workers`** by writing `pending` rows |
+| `trix-workers` | **Active** Python/taskiq ML workers — HDBSCAN clustering (computes the runs `trix-workers-node` bridges to it), community + anomaly detection, temporal patterns, multi-scale clustering, Hebbian co-activation, replay, event-stream. **Load-bearing, NOT legacy** — turning it off strands clustering/cluster-ops as `pending` forever. Complements `trix-workers-node`. ⚠️ decay/consolidation/relationship-decay are duplicated in BOTH services (no mutual-exclusion) — single-owner cleanup pending |
 | `trix-bots` | Bot/agent execution worker service |
 | `trix-daemon` | Background daemon |
 | `trix-settings` | Wails v2 settings app for trix-daemon |
