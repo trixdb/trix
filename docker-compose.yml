@@ -235,6 +235,11 @@ services:
       context: ./trix-workers-node
       dockerfile: Dockerfile
       target: production
+      args:
+        # Private @trixdb packages (npm.pkg.github.com) need a token at
+        # build time — export NPM_TOKEN before `docker compose build workers`
+        # (e.g. from `railway variables --service Workers-Node`).
+        NPM_TOKEN: ${NPM_TOKEN:-}
     container_name: trix-local-workers-node
     env_file:
       - .env.local
@@ -314,11 +319,18 @@ services:
     env_file:
       - .env.local
     environment:
+      # The workers' pydantic settings read DATABASE_URL (validation_alias),
+      # not the TRIXDB_-prefixed name the README suggests.
+      DATABASE_URL: postgresql://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
       TRIXDB_DATABASE_URL: postgresql://trix:Tr1x_L0cal_S3cret!@postgres:5432/trix
       REDIS_URL: redis://valkey:6379
       TRIXDB_LOG_LEVEL: INFO
       TRIXDB_METRICS_ENABLED: "true"
       TRIXDB_METRICS_PORT: 9090
+      # Single-container local setup: run the taskiq scheduler AND the worker.
+      # Without the scheduler, cron tasks (clustering.poll_pending etc.) never
+      # fire and clustering_runs rows stay 'pending' forever.
+      WORKER_MODE: both
     ports:
       - "${TRIX_PORT_ML_WORKERS:-19090}:9090"
     networks:
