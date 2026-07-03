@@ -65,3 +65,6 @@
 [submodule "trix-embeddings"]
 	path = trix-embeddings
 	url = git@github.com:trixdb/trix-embeddings.git
+[submodule "trix-sdk-go-examples"]
+	path = trix-sdk-go-examples
+	url = git@github.com:trixdb/trix-sdk-go-examples.git
