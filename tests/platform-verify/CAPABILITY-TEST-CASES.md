@@ -68,9 +68,46 @@ prod later surfaced as "failed" processing noise):
 | P1 | Status shape | `GET /v1/memories/processing` | `{total, processed, in_flight, failed, clustered, clustering_runs_active, percent}` all numbers, percent 0–100 |
 | P2 | Fresh store shows in flight | after M1 (pre-embedding) | `in_flight` ≥ 1 OR memory already processed (fast worker) — non-strict, informational |
 
+## M+ — Memories advanced
+
+| ID | Case | Expected |
+|----|------|----------|
+| M7 | Duplicate detection | identical content → 200 `{duplicate:true, memory_ids:[original]}` |
+| M8 | Tags | stored tags lowercased; `GET /v1/memories?tags=` overlap filter finds it |
+| M9 | Pin | `PATCH {is_pinned:true}`; appears in `?is_pinned=true` listing |
+| M10 | Protection | `soft` blocks hard delete (403); `none` re-enables |
+| M11 | Soft delete + restore | `DELETE ?soft=true` → `{success}`; `POST /:id/restore` → 200 |
+| M12 | Private visibility | second (non-admin) key gets 404 on another key's private memory |
+| M13 | Bulk create + delete | `POST /bulk` 201 `{succeeded:3}`; `DELETE /bulk {ids}` 200 |
+| M14 | Edit history | PATCH then `GET /:id/history` has ≥1 edit row |
+| M15 | Export | `GET /v1/export/memories` 200 |
+| M16 | Batch search | `POST /v1/search/batch` (fulltext+semantic) → strategies + merged memories |
+| M17 | Aggregate search | `GET /v1/search/aggregate?group_by=tags` → groups array |
+
+## T — Tasks · G — Goals · H — Habits
+
+| ID | Case | Expected |
+|----|------|----------|
+| T1–T5 | create (`title`) / list by space / subtask / complete via `PATCH {status:done}` (warns on incomplete subtasks) / delete | 201 · listed · 201 · 200+`warnings[]` · 204 |
+| G1–G5 | create / progress 0.5 / status completed / PATCH without `version` → 400 / delete | 201 progress 0 · 200 · 200 · 400 · 204 |
+| H1–H5 | create (`name`, streak init 0) / check-in `{}` / history has completion / analytics shape / delete | 201 · 201 · ≥1 · 200 · 204 |
+
+## W — Webhooks · A — Agents · K — Knowledge · SE — Spaces extras · KK — API keys
+
+| ID | Case | Expected |
+|----|------|----------|
+| W1–W4 | create (`url`+`events`) w/ secret / listed / invalid event → 400 / delete | 201 · listed · 400 · 204 |
+| A1–A4 | create (`name` only, default model) / get by slug / patch / delete | 201 · 200 · 200 · 204 |
+| K1–K5 | facts list shape / entities list shape / manual fact (`content`+`importance`; missing importance → 400) / communities list shape / detect → 200\|202 | shapes + negatives |
+| SE1–SE3 | get space by slug / space config GET / unknown feature key → 400 | 200 · 200 · 400 |
+| KK1–KK2 | create key (plaintext `key` returned once) / duplicate name → 409 | 201 · 409 |
+
+Skipped by decision: **notes** (2026-07-03).
+
 ## Cleanup (always)
 
 1. Delete all test memories (or rely on space cascade).
 2. Delete links (if any survived the tests).
-3. Delete both test spaces (`DELETE /v1/spaces/:id`) — cascades memories/grants.
-4. Verify: `GET /v1/search?q=<run stamp>` returns nothing.
+3. Delete test spaces (`DELETE /v1/spaces/:id`) — cascades memories/grants.
+4. Delete created webhooks, agents, tasks, goals, habits, and API keys.
+5. Verify: search for the run stamp returns no rows whose content contains it.
