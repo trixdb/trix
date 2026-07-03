@@ -102,6 +102,37 @@ prod later surfaced as "failed" processing noise):
 | SE1–SE3 | get space by slug / space config GET / unknown feature key → 400 | 200 · 200 · 400 |
 | KK1–KK2 | create key (plaintext `key` returned once) / duplicate name → 409 | 201 · 409 |
 
+## Round 3 — widened domains
+
+| ID | Domain | Cases |
+|----|--------|-------|
+| PJ1–PJ5 | Projects | create / link space / space embedded in GET / unlink / delete |
+| SS1–SS4 | Saved searches | create / listed / run returns results / delete |
+| B1–B6 | Billing | budget create/get/PUT/delete · credits shape · spending-limit set+restore |
+| GR1–GR4 | Space grants (enforcement) | non-admin key 404 → grant read → 200 → revoke → 404 |
+| PP1–PP5 | Pipeline presets | create (needs `retrieval.strategy+top_k`) / space default / resolve source=space / clear / delete |
+| SK1–SK3 | Skills | create / duplicate name 409 / delete |
+| WF1–WF3 | Workflows | create / get / delete (never triggered — LLM) |
+| CF1–CF2, IN1–IN4, CV1–CV2 | Observability | conflicts list+stats · memory insights · chunks · space summary · trending · conversations list · personas 410 tombstone |
+
+## Round 3 — deepened semantics
+
+| ID | Case | Expected |
+|----|------|----------|
+| D1 | Past `expires_at` | 201 on create, absent from list, 404 by id |
+| D2 | Content PATCH re-embeds | response `embedding_status: pending` |
+| D3–D4 | Caps: bulk 101 items, search limit 101 | 400 |
+| D5–D6 | Malformed uuid on GET/PATCH/restore | 400 (schema), never 500 |
+| D7–D8 | Unknown relationship_type / protection_level | 400 |
+| D9 | 101 tags on store | 400 (handler-enforced — body schema is empty by design) |
+| D10 | `skip_duplicate_check` | second row with new id |
+| D11 | Merge reparents tasks/goals/habits | `moved` map ≥1 each; target task list shows it |
+| D12 | Pagination walk (5 items, limit 2) | all seen, `total=5`, `has_more` flips |
+| D13–D15 | Relationship lifecycle | bidirectional shows both directions / reinforce bumps weight / delete then 404 |
+| D16 | Idempotent habit check-in | same `Idempotency-Key` → same completion id |
+| D17 | Privilege escalation | non-admin key minting admin key → 403 |
+| D18 | Concurrency | 10 parallel stores all 201 + all listed |
+
 Skipped by decision: **notes** (2026-07-03).
 
 ## Cleanup (always)
