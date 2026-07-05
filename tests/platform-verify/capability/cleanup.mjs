@@ -16,6 +16,7 @@ export async function cleanup() {
     ['tasks', 'v1/tasks'],
     ['goals', 'v1/goals'],
     ['habits', 'v1/habits'],
+    ['notes', 'v1/notes'], // notes.space_id is SET NULL on space delete — no cascade
     ['keys', 'v1/accounts/api-keys'],
   ]) {
     for (const id of state[kind]) {
