@@ -12,7 +12,7 @@ export const state = {
   spaces: [], links: [], memories: [], keys: [], webhooks: [],
   agents: [], tasks: [], goals: [], habits: [],
   projects: [], conversations: [], savedSearches: [], budgets: [],
-  skills: [], workflows: [], pipelinePresets: [],
+  skills: [], workflows: [], pipelinePresets: [], notes: [],
 };
 
 export async function api(method, path, body, timeoutMs = 30_000) {

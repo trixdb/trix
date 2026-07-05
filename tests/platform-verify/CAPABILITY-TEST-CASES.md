@@ -135,6 +135,41 @@ prod later surfaced as "failed" processing noise):
 
 Skipped by decision: **notes** (2026-07-03).
 
+## Round 4 — space links (L) & merge blast radius (MG) — draft
+
+From four recon reports over trix-api space-link/merge routes and the
+trix-workers link-clustering path. Cases tagged **(post-fix)** assert the
+INTENDED contract shipped on trix-api branch `fix/link-route-gaps` (non-UUID
+linkId → 400 not 500, DELETE link scoped to `:spaceId`, batch relationships
+enforcing + stamping the cross-space link gate); they FAIL against unfixed
+builds by design.
+
+| ID | Case | Expected |
+|----|------|----------|
+| L1 | Link create by slug + symmetry | 201; slugs resolved to `space_a_id`/`space_b_id` UUIDs; link listed from both sides |
+| L2 | Self-link | 400 |
+| L3 | Duplicate link rejected in BOTH orders | A→B 400 and B→A 400 (LEAST/GREATEST uniqueness) |
+| L4 | Nonexistent target status split | unknown slug → 404; unknown valid UUID → 403 (create and links-list alike) |
+| L5 | Non-UUID `linkId` (post-fix) | DELETE + refresh → 400, never 500 |
+| L6 | DELETE link scoping (post-fix) | refresh AND delete via an unrelated space → 404; link survives |
+| L7 | Relationship gate + `link_id` stamping | unlinked cross-space create → 400; linked → created and edge carries `link_id` = link |
+| L8 | Unlink reversibility | 200 with `removed.relationships ≥ 1`; edge gone; memories + both spaces intact; gate re-closed (retry → 400) |
+| L9 | Batch gate parity (post-fix) | unlinked cross-space item lands in `failed[]` per-item while same-space item in the same call succeeds |
+| L10 | Batch edges link-tagged (post-fix) | linked batch edge has `link_id`; unlink cascades it (`removed.relationships ≥ 1`, edge gone) |
+| L11 | Link clusters built over the union (worker) | ≥1 cluster whose detail (`GET /v1/clusters/:id`) has `link_id` = link, members from BOTH spaces (12 embedded memories ≥ min 10); poll ≤180s, SKIP on worker timeout like C2 |
+| L12 | Refresh replaces clusters | 202; all cluster ids replaced atomically (old detail 404s, no doubling) |
+| L13 | Unlink cascade + re-link rebuild | `removed.clusters` equals observed count and list empties with NO polling (synchronous cascade); re-link 201 under a NEW link id, fresh clusters rebuilt |
+| MG1 | Merge error matrix | self-merge 400 (uuid and slug alias) · `confirm:false` 400 · bogus slug 404 · bogus UUID 403 |
+| MG2 | Moved-map census | seeded webhook/note/label/feature/grant/project/memory keys all ≥1; NO_FK_REFS keys (`budget_configs.scope_id`, `event_journal.space_id`) present; ≥40 keys total; `auditId` returned |
+| MG3 | Reparent verification | webhook, note, feature override, grant, and project-space link all reference the target after merge |
+| MG4 | Feature-config collision | target override wins; moved value flips to `{moved, dropped≥1}` |
+| MG5 | Grant collision downgrade | exactly one grant survives for the actor and it is the target's LOWER permission (`read` beats source `admin`); `dropped ≥ 1` |
+| MG6 | Default pipeline lost | source's preset (stored on the deleted spaces row) never inherited — target stays `{name:null}` |
+| MG7 | Direct link superseded | `moved['space_links.superseded'] === 1`; link gone from target's list; the link-tagged cross-space edge is cascade-deleted even though both memories now co-locate in the target |
+| MG8 | Third-space link reparented | SAME link id survives with endpoints {C, target}; no `superseded` key; `space_links.*` moved total = 1 |
+| MG9 | Source gone + totals | source space 404s; `GET /v1/memories?space_id=<dead>` silently 200 with `total=0`; target total = sum; token searchable scoped to target |
+| MG10 | Saved-search dangling `space_id` | post-merge run → 200 with 0 results (silent, NOT 500); stored `query_params.space_id` keeps the dead id |
+
 ## Cleanup (always)
 
 1. Delete all test memories (or rely on space cascade).

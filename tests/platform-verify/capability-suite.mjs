@@ -21,6 +21,11 @@ import {
 import {
   deepMemoriesSuite, deepLifecycleSuite, deepRelationshipsSuite, deepPlatformSuite,
 } from './capability/cases-deep.mjs';
+import {
+  linksErrorContractSuite, linksRelationshipGateSuite, linksBatchGateSuite,
+} from './capability/cases-links.mjs';
+import { linksWorkerSuite } from './capability/cases-links-worker.mjs';
+import { mergeContractSuite, mergeBlastRadiusSuite } from './capability/cases-merge.mjs';
 import { cleanup } from './capability/cleanup.mjs';
 
 if (!API_KEY) {
@@ -57,6 +62,12 @@ if (!API_KEY) {
     await deepLifecycleSuite();
     await deepRelationshipsSuite(a);
     await deepPlatformSuite(a, secondKey);
+    await linksErrorContractSuite();
+    await linksRelationshipGateSuite();
+    await linksBatchGateSuite();
+    await linksWorkerSuite();
+    await mergeContractSuite(secondKey);
+    await mergeBlastRadiusSuite();
   } catch (err) {
     fail('SUITE', String(err));
   } finally {
