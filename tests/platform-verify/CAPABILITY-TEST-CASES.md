@@ -133,6 +133,17 @@ prod later surfaced as "failed" processing noise):
 | D17 | Privilege escalation | non-admin key minting admin key → 403 |
 | D18 | Concurrency | 10 parallel stores all 201 + all listed |
 
+## Round 5 — on-demand community detection (CD)
+
+| ID | Case | Expected |
+|----|------|----------|
+| CD1 | POST /detect ×2 back-to-back | both 202 `{status:'queued'}` |
+| CD2 | run lands in GET /runs and settles | `completed`, `algorithm=louvain`, integer `communities_found`, `nodes_processed` |
+| CD3 | concurrent-detect dedup | exactly 1 fresh run from the 2 detects (fixed jobId + bridge NOT-EXISTS) |
+| CD4 | list/detail/members coherence | list length coherent with `communities_found`; detail + members 200 |
+| CD5 | POST /:id/summarize | 202/200 or honest 503 — never 500 (was a TypeError) |
+| CD6 | replace semantics | second full run keeps community count stable (no accumulation) |
+
 Skipped by decision: **notes** (2026-07-03).
 
 ## Round 4 — space links (L) & merge blast radius (MG) — draft

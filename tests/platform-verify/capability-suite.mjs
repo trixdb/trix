@@ -26,6 +26,7 @@ import {
 } from './capability/cases-links.mjs';
 import { linksWorkerSuite } from './capability/cases-links-worker.mjs';
 import { mergeContractSuite, mergeBlastRadiusSuite } from './capability/cases-merge.mjs';
+import { communitiesSuite } from './capability/cases-communities.mjs';
 import { cleanup } from './capability/cleanup.mjs';
 
 if (!API_KEY) {
@@ -68,6 +69,7 @@ if (!API_KEY) {
     await linksWorkerSuite();
     await mergeContractSuite(secondKey);
     await mergeBlastRadiusSuite();
+    await communitiesSuite();
   } catch (err) {
     fail('SUITE', String(err));
   } finally {

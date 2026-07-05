@@ -31,7 +31,7 @@ const allEmbedded = (ids) => pollUntil(async () => {
   const checks = await Promise.all(ids.map((id) => api('GET', `v1/memories/${id}`)));
   const done = checks.every((r) => (r.body?.embedding_status ?? r.body?.memory?.embedding_status) === 'completed');
   return done ? true : null;
-}, { timeoutMs: 120_000, everyMs: 5_000 });
+}, { timeoutMs: 240_000, everyMs: 5_000 }); // 20 seeds need more than the old 120s budget
 
 // clusters list does not project link_id — find link clusters via the
 // '· link <first8>' name suffix, then confirm link_id on the detail route.
