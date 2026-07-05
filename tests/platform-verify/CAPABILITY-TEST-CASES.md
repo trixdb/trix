@@ -181,10 +181,64 @@ builds by design.
 | MG9 | Source gone + totals | source space 404s; `GET /v1/memories?space_id=<dead>` silently 200 with `total=0`; target total = sum; token searchable scoped to target |
 | MG10 | Saved-search dangling `space_id` | post-merge run → 200 with 0 results (silent, NOT 500); stored `query_params.space_id` keeps the dead id |
 
+## Round 6 — notifications (NR): routing rules + in-app inbox (ADR-054)
+
+Genuinely uncovered domain — nothing else in the suite touches notifications.
+All routes are account-scoped via `fastify.authenticate`, so the suite's
+service `TRIX_API_KEY` drives them directly (no user-scoped key or
+email/password flow). Created rules carry the run STAMP in `config` and are
+tracked in `state.notificationRules` for cleanup. NR3 mirrors D7's
+"unknown relationship_type → 400" as "invalid event_pattern → 400". The module
+self-heals a leftover `memory.created`/`in_app` rule from a crashed prior run
+before creating, so the `(account_id, event_pattern, channel, space_id)` unique
+index can't 500 the create.
+
+| ID | Case | Expected |
+|----|------|----------|
+| NR1 | `GET /v1/notifications/rules` | 200 `{rules:[…]}`; ADR-054 defaults seeded at registration present (`task.overdue`/`agent.failed`) |
+| NR2 | `POST /v1/notifications/rules {event_pattern:'memory.created', channel:'in_app'}` | 201 with id |
+| NR3 | `POST …/rules {event_pattern:'<stamp>.bogus'}` | 400 `error:'Invalid event_pattern'` (handler validates beyond schema) |
+| NR4 | `GET …/rules` after create | created rule listed with `event_pattern`/`channel` intact |
+| NR5 | `PATCH …/rules/:id {enabled:false}` + PATCH nil-uuid | 200 `enabled=false`; unknown id → 404 |
+| NR6 | `DELETE …/rules/:id` twice | first 204, second 404 (honest not-found) |
+| NR7 | `GET …/inbox?limit=5` + `GET …/inbox/unread-count` | 200 `{notifications:[…]}` array; 200 integer `unread_count ≥ 0`, coherent with page |
+
+## Round 6 — interactive auth & session lifecycle (AU)
+
+The class the suite structurally could not catch: every other case runs on one
+SERVICE api key (`gdb_`, `is_service=true`) via `lib.api()`, which BYPASSES
+login — which is why the P1 login-500 slipped through. AU drives the real
+`POST /v1/auth/*` email/password + JWT flow with its own JWT-aware fetch helper.
+
+**Safety** (`loginSecurity` is wired in prod, so lockout + login limiter are
+real): the founder account is **reused, never registered/deleted**
+(`TRIX_TEST_EMAIL`/`TRIX_TEST_PASSWORD`); the login flow **SKIPs cleanly** when
+those are unset. Exactly **one** real-account login per run (AU1). Every 401
+negative and forgot-password hits a **random nonexistent email** (failureReason
+`user_not_found` → no lockout, per-email bucket stays fresh); the real account
+is **never wrong-passworded**. Register is only probed with non-durable
+negatives. AU9–AU13 need no creds and run on every invocation.
+
+| ID | Case | Expected |
+|----|------|----------|
+| AU1 | `POST /login` happy path (reused account) | 200 with a full JWT (`token`) + `gdr_` `refresh_token` pair, `user.id`+`account.id`; **explicit 500 guard = the P1 regression**; 429/423 → SKIP (never lock/rate-limit the founder) |
+| AU2 | `GET /me` with the JWT | 200 `{user.id, accounts:[…], current_account}` — the token works on an authenticated GET |
+| AU3 | service API key (`gdb_`) on `/me` | 401 — `authenticateUser` is JWT-only; this is exactly why the service-key suite can't reach this flow |
+| AU4 | `POST /refresh {refresh_token}` | 200 new `{token, refresh_token≠old, token_type:'Bearer', expires_in:604800}` (single-use rotation) |
+| AU5 | replay the consumed refresh token | 401 — family burn (`token_reuse_detected`) |
+| AU6 | `POST /switch-account/:ownAccountId` | 200 with a rebound JWT (safe no-op switch to own membership) |
+| AU7 | `POST /logout` with the JWT | 200 — JWT blacklisted for its remaining TTL |
+| AU8 | `GET /me` with the just-logged-out JWT | 401 — revoked/blacklisted |
+| AU9 | `POST /login` with a RANDOM nonexistent email + any password | 401 invalid credentials, **never 500**, no lockout path |
+| AU10 | `POST /login` missing `password` | 400 schema validation (runs before the rate-limit preHandler → no slot burned) |
+| AU11 | `POST /forgot-password {random email}` | neutral 200 message (enumeration-safe; nothing sent, no row touched) |
+| AU12 | `POST /register` with a disposable domain | 400 (first check in the handler, before invite/dup — holds regardless of gating; no row) |
+| AU13 | register gating (runtime probe `GET /invite-required`) | gated → missing-invite 400 + bogus `/validate-invite` 400 (random emails); open → dup-email 409 reusing `TEST_EMAIL` (no new row), else SKIP |
+
 ## Cleanup (always)
 
 1. Delete all test memories (or rely on space cascade).
 2. Delete links (if any survived the tests).
 3. Delete test spaces (`DELETE /v1/spaces/:id`) — cascades memories/grants.
-4. Delete created webhooks, agents, tasks, goals, habits, and API keys.
+4. Delete created webhooks, agents, tasks, goals, habits, notification rules, and API keys.
 5. Verify: search for the run stamp returns no rows whose content contains it.

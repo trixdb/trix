@@ -13,6 +13,7 @@ export const state = {
   agents: [], tasks: [], goals: [], habits: [],
   projects: [], conversations: [], savedSearches: [], budgets: [],
   skills: [], workflows: [], pipelinePresets: [], notes: [],
+  notificationRules: [],
 };
 
 export async function api(method, path, body, timeoutMs = 30_000) {
