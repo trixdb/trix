@@ -8,12 +8,20 @@ import { api, ok, fail, skip, state, STAMP, makeSpace, remember, pollUntil } fro
 // compute) is 30–90s typical; polls budget 180s and SKIP on timeout, matching
 // the C2 convention. Unlink cascade is synchronous — asserted with no polling.
 
-const TOPIC = 'sourdough starter hydration and fermentation schedule';
+// Two DISTINCT topics, each split across both spaces: HDBSCAN never returns
+// the root cluster, so a mono-topic union labels everything noise (observed
+// live: memories_processed=12, clusters_created=0). Two dense topics of 10
+// give it a split below the root, and each cluster spans both spaces.
+const TOPICS = [
+  'sourdough starter hydration and fermentation schedule',
+  'kubernetes pod autoscaling thresholds and rollout strategy',
+];
 
 async function seedEmbedded(spaceId, n, tag) {
   const ids = [];
   for (let i = 0; i < n; i++) {
-    const m = await remember(`${STAMP} ${tag} note ${i}: the ${TOPIC} stays identical at feeding ${i}`, spaceId);
+    const topic = TOPICS[i % 2];
+    const m = await remember(`${STAMP} ${tag} note ${i}: the ${topic} stays identical at revision ${i}`, spaceId);
     if (m.id) ids.push(m.id);
   }
   return ids;
@@ -43,8 +51,8 @@ export async function linksWorkerSuite() {
   // L11 link creation builds link-tagged clusters over the union of A and B.
   const a = await makeSpace('lwa');
   const b = await makeSpace('lwb');
-  const aIds = await seedEmbedded(a, 6, 'lwa');
-  const bIds = await seedEmbedded(b, 6, 'lwb');
+  const aIds = await seedEmbedded(a, 10, 'lwa');
+  const bIds = await seedEmbedded(b, 10, 'lwb');
   if (!(await allEmbedded([...aIds, ...bIds]))) {
     skip('L11', 'embeddings not completed within 120s');
     skipRest('prereq L11 skipped');
