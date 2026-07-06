@@ -144,6 +144,19 @@ prod later surfaced as "failed" processing noise):
 | CD5 | POST /:id/summarize | 202/200 or honest 503 — never 500 (was a TypeError) |
 | CD6 | replace semantics | second full run keeps community count stable (no accumulation) |
 
+## Server-side list pagination + search (SL)
+
+| ID | Case | Expected |
+|----|------|----------|
+| SL1 | spaces `?limit=2` | 2-item page, integer `total`, boolean `has_more`, key `spaces` kept |
+| SL2 | spaces offset walk | `offset=2` page disjoint from `offset=0` |
+| SL3 | spaces no `limit` | returns ALL (back-compat unbounded) |
+| SL4 | spaces `?q=STAMP` | server-filtered; every row contains the stamp |
+| SL5–7 | api-keys / agents / budgets `?limit=2` | paginate + envelope key preserved |
+| SL8–9 | generations / communities | paginated shape (`generations`+`total` / canonical `data`) |
+| SL10 | member drill-in `?limit=101` | 400 (limit capped, no unbounded slice) |
+| SL11 | memories `?q=` | canonical server search still works |
+
 Skipped by decision: **notes** (2026-07-03).
 
 ## Round 4 — space links (L) & merge blast radius (MG) — draft

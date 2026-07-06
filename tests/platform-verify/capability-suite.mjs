@@ -27,6 +27,7 @@ import {
 import { linksWorkerSuite } from './capability/cases-links-worker.mjs';
 import { mergeContractSuite, mergeBlastRadiusSuite } from './capability/cases-merge.mjs';
 import { communitiesSuite } from './capability/cases-communities.mjs';
+import { serverListsSuite } from './capability/cases-server-lists.mjs';
 import { notificationRulesSuite, notificationInboxSuite } from './capability/cases-widen2.mjs';
 import { authSuite } from './capability/cases-auth.mjs';
 import { cleanup } from './capability/cleanup.mjs';
@@ -72,6 +73,7 @@ if (!API_KEY) {
     await mergeContractSuite(secondKey);
     await mergeBlastRadiusSuite();
     await communitiesSuite();
+    await serverListsSuite(a, secondKey);
     await notificationRulesSuite();
     await notificationInboxSuite();
     // AU — interactive JWT auth/session flow. Self-guards: the login flow SKIPs
