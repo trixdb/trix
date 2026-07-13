@@ -78,6 +78,19 @@ Next-iter builds the *feasible* last-mile: a pure adapter + a ready-to-apply ADR
 - `nl-to-mql.ts`: utterance → validated MQL via injectable LLM + bounded self-repair loop
   (data-driven prompt from the registry). 5 tests with a scripted model. 84 tests total.
 
+### Iter 4 — 2026-07-13 (follow-up request) ✅ Query page shipped to trix-landing
+- Vendored the MQL library into `trix-landing/src/lib/mql/` (made source `verbatimModuleSyntax`-
+  compatible first). Added **Account → Query** page (`src/routes/account/query/+page.svelte`):
+  live parse/validate/compile as you type; flat queries run against `GET /v1/memories` and render
+  real results; composition shows the compiled SQL + "needs server support". Sidebar "Query" link
+  added between Chat and Inbox. `src/lib/api/mql-api.ts` + `mql-api.spec.ts` (3 specs).
+- VERIFIED IN A REAL BROWSER (dev auto-login): valid→results (4 mock memories), composition→entity-
+  join SQL + resolved relative-time params, invalid→2 caret diagnostics + disabled Run. Also:
+  svelte-check 0/0, production build passes, eslint clean on new files. Screenshots in
+  worktree `screenshots/mql-query-page-*.png`.
+- Landing work committed on branch **`feat/mql-query-page`** (trix-landing repo), commit 5c7dafa.
+- Added EXAMPLES.md cookbook.
+
 ## STATUS: COMPLETE for this worktree — loop wound down (cron 3cd84ee8 deleted)
 Everything feasible here is DONE and validated. Full pipeline built + hardened:
 lex→parse→validate→compile(flat+SQL)→print→search-request adapter→NL→MQL. **84 tests / 2
