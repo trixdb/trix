@@ -17,6 +17,8 @@ export { compile } from './compiler.js';
 export { print } from './printer.js';
 export { toSearchRequest } from './to-search-request.js';
 export type { SearchRequest } from './to-search-request.js';
+export { nlToMql, buildSystemPrompt, extractMql } from './nl-to-mql.js';
+export type { LlmFn, NlToMqlResult, NlToMqlOptions } from './nl-to-mql.js';
 export { trixMemoryRegistry } from './fields.js';
 export { lex } from './lexer.js';
 
