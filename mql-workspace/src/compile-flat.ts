@@ -1,6 +1,7 @@
-import { CompareOp, Expr, Predicate } from './ast.js';
-import { FieldRegistry } from './field-registry.js';
-import { FlatFilters, resolveLiteral } from './query-plan.js';
+import type { CompareOp, Expr, Predicate } from './ast.js';
+import type { FieldRegistry } from './field-registry.js';
+import type { FlatFilters } from './query-plan.js';
+import { resolveLiteral } from './query-plan.js';
 
 /**
  * Attempts to compile a filter into the existing flat `listMemoriesSchema`

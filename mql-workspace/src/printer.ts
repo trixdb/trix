@@ -1,4 +1,4 @@
-import { CompareOp, Expr, OrderBy, Query, Value } from './ast.js';
+import type { CompareOp, Expr, OrderBy, Query, Value } from './ast.js';
 
 /**
  * Renders a {@link Query} back to canonical MQL text. This is the inverse of the

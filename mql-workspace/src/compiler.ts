@@ -1,8 +1,8 @@
-import { OrderBy, Query } from './ast.js';
+import type { OrderBy, Query } from './ast.js';
 import { compileFlat } from './compile-flat.js';
 import { compileWhere } from './compile-sql.js';
-import { FieldRegistry } from './field-registry.js';
-import { CompileOptions, PlanOrder, QueryPlan } from './query-plan.js';
+import type { FieldRegistry } from './field-registry.js';
+import type { CompileOptions, PlanOrder, QueryPlan } from './query-plan.js';
 
 /**
  * Compiles a validated {@link Query} into an executable {@link QueryPlan}.

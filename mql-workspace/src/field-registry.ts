@@ -1,4 +1,4 @@
-import { CompareOp } from './ast.js';
+import type { CompareOp } from './ast.js';
 
 /**
  * The field registry is MQL's single source of truth for *what is queryable*.

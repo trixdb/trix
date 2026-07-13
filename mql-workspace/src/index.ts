@@ -1,10 +1,10 @@
-import { Query } from './ast.js';
+import type { Query } from './ast.js';
 import { compile } from './compiler.js';
-import { FieldRegistry } from './field-registry.js';
+import type { FieldRegistry } from './field-registry.js';
 import { trixMemoryRegistry } from './fields.js';
 import { parse } from './parser.js';
-import { CompileOptions, QueryPlan } from './query-plan.js';
-import { Result } from './errors.js';
+import type { CompileOptions, QueryPlan } from './query-plan.js';
+import type { Result } from './errors.js';
 import { validate } from './validator.js';
 
 export * from './ast.js';

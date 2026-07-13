@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { LlmFn, buildSystemPrompt, extractMql, nlToMql } from './nl-to-mql.js';
+import type { LlmFn } from './nl-to-mql.js';
+import { buildSystemPrompt, extractMql, nlToMql } from './nl-to-mql.js';
 import { trixMemoryRegistry } from './fields.js';
 
 const reg = trixMemoryRegistry();

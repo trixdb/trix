@@ -1,12 +1,11 @@
 import {
   BOOL_OPS,
   DATE_OPS,
-  DynamicNamespace,
   EQUALITY_OPS,
-  FieldDef,
   FieldRegistry,
   NUMBER_OPS,
 } from './field-registry.js';
+import type { DynamicNamespace, FieldDef } from './field-registry.js';
 
 /**
  * The Trix memory field catalogue — the queryable surface of MQL, derived from

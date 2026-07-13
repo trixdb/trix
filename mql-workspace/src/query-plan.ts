@@ -1,4 +1,4 @@
-import { Value } from './ast.js';
+import type { Value } from './ast.js';
 
 /**
  * The compile target. A {@link QueryPlan} is what MQL produces for a host to

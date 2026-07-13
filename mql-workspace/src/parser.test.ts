@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Query } from './ast.js';
+import type { Query } from './ast.js';
 import { parse } from './parser.js';
 
 function ast(src: string): Query {

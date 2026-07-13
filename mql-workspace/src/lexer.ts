@@ -1,5 +1,7 @@
-import { Result, err, mqlError, ok } from './errors.js';
-import { Token, TokenKind, token } from './token.js';
+import type { Result } from './errors.js';
+import { err, mqlError, ok } from './errors.js';
+import type { Token } from './token.js';
+import { TokenKind, token } from './token.js';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)?/;
 const NUMBER_RE = /^\d+(?:\.\d+)?/;

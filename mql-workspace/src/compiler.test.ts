@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { compileMql } from './index.js';
-import { QueryPlan } from './query-plan.js';
+import type { QueryPlan } from './query-plan.js';
 
 const NOW = new Date('2026-07-13T12:00:00.000Z');
 

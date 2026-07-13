@@ -1,4 +1,4 @@
-import { QueryPlan } from './query-plan.js';
+import type { QueryPlan } from './query-plan.js';
 
 /**
  * Adapter: maps a compiled {@link QueryPlan} onto the request shape the existing

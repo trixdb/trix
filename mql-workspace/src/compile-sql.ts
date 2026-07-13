@@ -1,6 +1,7 @@
-import { CompareOp, Expr, Predicate, Value } from './ast.js';
-import { FieldRegistry, ResolvedField } from './field-registry.js';
-import { SqlFragment, resolveLiteral } from './query-plan.js';
+import type { CompareOp, Expr, Predicate, Value } from './ast.js';
+import type { FieldRegistry, ResolvedField } from './field-registry.js';
+import type { SqlFragment } from './query-plan.js';
+import { resolveLiteral } from './query-plan.js';
 
 /**
  * Compiles a boolean {@link Expr} into a parameterised SQL WHERE fragment — the

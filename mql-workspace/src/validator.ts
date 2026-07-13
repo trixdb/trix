@@ -1,6 +1,7 @@
-import { Expr, Predicate, Query, Value } from './ast.js';
-import { FieldRegistry, FieldType, ResolvedField } from './field-registry.js';
-import { MqlError, Result, err, mqlError, ok } from './errors.js';
+import type { Expr, Predicate, Query, Value } from './ast.js';
+import type { FieldRegistry, FieldType, ResolvedField } from './field-registry.js';
+import type { MqlError, Result } from './errors.js';
+import { err, mqlError, ok } from './errors.js';
 
 /**
  * Semantic analysis: checks a parsed {@link Query} against a {@link FieldRegistry}.

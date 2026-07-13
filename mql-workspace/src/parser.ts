@@ -1,4 +1,4 @@
-import {
+import type {
   CompareOp,
   Expr,
   OrderBy,
@@ -6,14 +6,13 @@ import {
   Query,
   Similarity,
   Value,
-  and,
-  not,
-  or,
-  predicate,
 } from './ast.js';
-import { MqlError, Result, err, mqlError, ok } from './errors.js';
+import { and, not, or, predicate } from './ast.js';
+import type { MqlError, Result } from './errors.js';
+import { err, mqlError, ok } from './errors.js';
 import { lex } from './lexer.js';
-import { Token, TokenKind } from './token.js';
+import type { Token } from './token.js';
+import { TokenKind } from './token.js';
 
 /** Words that are operators/clauses, never field names. */
 const RESERVED = new Set(['and', 'or', 'not', 'in', 'between', 'order', 'by', 'limit']);

@@ -1,7 +1,8 @@
-import { FieldRegistry } from './field-registry.js';
+import type { FieldRegistry } from './field-registry.js';
 import { trixMemoryRegistry } from './fields.js';
-import { MqlError, Result, err, mqlError, ok } from './errors.js';
-import { QueryPlan } from './query-plan.js';
+import type { MqlError, Result } from './errors.js';
+import { err, mqlError, ok } from './errors.js';
+import type { QueryPlan } from './query-plan.js';
 import { analyzeMql, compileMql } from './index.js';
 
 /**

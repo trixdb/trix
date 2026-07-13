@@ -58,6 +58,14 @@ if (r.ok) {
 }
 ```
 
+## Examples & UI
+- **[EXAMPLES.md](./EXAMPLES.md)** — a categorized cookbook (filters, ranges,
+  temporal, boolean composition, graph, semantic, metadata, ordering) with what
+  each query compiles to.
+- **Query page** — the library is vendored into `trix-landing` and powers the
+  **Account → Query** page: a live playground that compiles as you type, runs flat
+  queries against `/v1/memories`, and shows the compiled plan + an inline reference.
+
 ## Develop
 ```
 npm install
