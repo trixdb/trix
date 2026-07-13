@@ -36,21 +36,49 @@ Pipeline: `text → lex → parse → validate → compile → QueryPlan`.
 ### Iter 1 — 2026-07-13 16:45–17:03 UTC ✅
 - Loop set up (cron 3cd84ee8) + worktree. Web research (Mem0/Zep/Letta) + full codebase map.
 - Built ENTIRE core pipeline + value-validation. Hypothesis CONFIRMED. 58 tests, 5 commits.
+### Iter 2 — 2026-07-13 17:04–17:15 UTC ✅
+- Fixed entity/topic join SQL to the REAL schema (memory_facts→fact_entities→memory_entities;
+  enrichments.result->'topics' JSONB) — prior single-table templates were wrong.
+- pg-mem integration suite: compiled SQL executes correctly on real Postgres engine
+  (range/OR/NOT/AND/between/tag-overlap), tenancy guard via paramOffset, params bind safely.
+  Correlated-EXISTS cases skip on pg-mem (its limitation); entity join path validated separately.
+- AST printer (canonical render) + property/fuzz tests (fast-check, pinned seed): parser total;
+  round-trip identical compiled plans. Fuzzing found+fixed an unvalidated-compile TypeError.
+- 71 tests / 2 skipped, typecheck clean. 3 commits.
+
+### Iter 3 — 2026-07-13 17:15–17:18 UTC ✅
+- Built pure `to-search-request.ts` adapter: QueryPlan → the exact `listMemoriesSchema`
+  request shape (flat path) or `{whereSql, whereParams}` (SQL path) + q/mode/sort/order/limit.
+  6 tests. Proves the last-mile integration without a running server.
+- Wrote `WIRING_ADR.md`: concrete, ready-to-apply recipe to add `?mql=` to GET /v1/memories
+  (4 real files + guards + rollout). 77 tests / 2 skipped. 1 commit.
+
+## IMPORTANT constraint discovered
+`trix-api` submodule is **empty/unchecked-out in this worktree** — cannot build/test trix-api
+here. So the actual `?mql=` endpoint wiring must happen in the main trix-api checkout, not here.
+Next-iter builds the *feasible* last-mile: a pure adapter + a ready-to-apply ADR.
 
 ## Next steps (ordered — for the next iteration)
-1. **Confirm entity/topic join schema** against live migrations (memory_entities/memory_topics
-   table+columns) — compile-sql.ts currently uses host-tunable EXISTS templates. Fix column
-   names if wrong. (grep trix-api/migrations for the real junctions.)
-2. **Integration test against real Postgres**: run a compiled `where.sql` fragment (with tenancy
-   guards prepended) against a seeded memories table; assert it returns the right rows. Use the
-   trix-api test harness pattern (buildServer + test-utils / per-file isolation — see memory
-   [local-stack-and-e2e-gotchas]).
-3. **Wire a thin seam in trix-api**: either `?mql=` param on GET /v1/memories or POST /v1/memories/mql.
-   Compile → merge filters into search-context-builder / append where fragment with account guards.
-   Keep it additive; <3 files if possible (else pause per CODING_STANDARDS).
-4. **NL→MQL builder** mirroring CQL's build-cql-query (optional, LLM prompt → MQL string).
-5. **Property tests** (fast-check): parse∘print round-trips; never-throws on arbitrary input.
-6. Port module to trix-api/src/lib/mql/ once schema confirmed; align test runner (vitest).
+1. **Build `to-search-request.ts` adapter** (pure, testable here): map a `QueryPlan` onto the
+   documented `listMemoriesSchema` request object for the flat path; for the SQL path emit the
+   `{ whereSql, params }` the host appends after tenancy guards. Unit-test the full mapping.
+   This proves the last-mile without a running server.
+2. **Write WIRING_ADR.md**: exact recipe to add `?mql=` to GET /v1/memories in the trix-api repo
+   — files touched (schema `src/schemas/memories.js`, handler `memories-search.js`, a small
+   `src/lib/mql/` port), where filters merge (search-context-builder), how the where-fragment
+   attaches with account_id/is_deleted guards + paramOffset. Flag the >3-file coupling gate.
+3. **NL→MQL builder** (optional): mirror CQL's build-cql-query — LLM prompt: NL → MQL string,
+   then compileMql validates. High leverage for agent/chat use.
+4. **Port module to trix-api/src/lib/mql/** (in the MAIN checkout, a future session): align to
+   vitest/jest there, wire the endpoint per the ADR, run the trix-api integration harness.
+5. Consider: geo predicates (lat/long/geohash cols exist), saved-MQL (reuse saved_searches),
+   `explain` output (human description of a compiled plan).
+
+## Assessment: approaching diminishing returns for THIS worktree
+Core library is complete + hardened (parse/validate/compile/print, 71 tests, real-DB exec,
+fuzzed). Remaining high-value work (endpoint wiring, port) requires the main trix-api checkout,
+not this worktree. Iter 3 should do the adapter + ADR (feasible here), then the loop likely
+winds down until a human ports it into trix-api proper.
 
 ## Key decisions (stable)
 - Compile to existing flat filter object when pure-AND; else parameterised SQL fragment

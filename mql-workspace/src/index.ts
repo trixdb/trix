@@ -15,6 +15,8 @@ export { parse } from './parser.js';
 export { validate } from './validator.js';
 export { compile } from './compiler.js';
 export { print } from './printer.js';
+export { toSearchRequest } from './to-search-request.js';
+export type { SearchRequest } from './to-search-request.js';
 export { trixMemoryRegistry } from './fields.js';
 export { lex } from './lexer.js';
 
