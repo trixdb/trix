@@ -2,6 +2,7 @@ import type { Expr, Predicate, Query, Value } from './ast.js';
 import type { FieldRegistry, FieldType, ResolvedField } from './field-registry.js';
 import type { MqlError, Result } from './errors.js';
 import { err, mqlError, ok } from './errors.js';
+import { nearestName } from './suggest.js';
 
 /**
  * Semantic analysis: checks a parsed {@link Query} against a {@link FieldRegistry}.
@@ -33,7 +34,9 @@ function checkExpr(node: Expr, reg: FieldRegistry, errors: MqlError[]): void {
 function checkPredicate(p: Predicate, reg: FieldRegistry, errors: MqlError[]): void {
   const field = reg.resolve(p.field);
   if (!field) {
-    errors.push(mqlError('validate', `unknown field '${p.field}'`, p.span.start, p.span.end));
+    const hint = nearestName(p.field, reg.allNames());
+    const msg = hint ? `unknown field '${p.field}' — did you mean '${hint}'?` : `unknown field '${p.field}'`;
+    errors.push(mqlError('validate', msg, p.span.start, p.span.end));
     return;
   }
   if (!field.ops.includes(p.op)) {
@@ -62,8 +65,10 @@ function checkValues(p: Predicate, field: ResolvedField, errors: MqlError[]): vo
 function checkEnum(v: Value, field: ResolvedField, p: Predicate, errors: MqlError[]): void {
   const literal = valueText(v).toLowerCase();
   const allowed = (field.enumValues ?? []).map((e) => e.toLowerCase());
-  if (allowed.length && !allowed.includes(literal))
-    errors.push(mqlError('validate', `'${valueText(v)}' is not a valid ${field.name} (one of: ${field.enumValues!.join(', ')})`, p.span.start, p.span.end));
+  if (!allowed.length || allowed.includes(literal)) return;
+  const hint = nearestName(valueText(v), field.enumValues ?? [], 2);
+  const suffix = hint ? `did you mean '${hint}'?` : `one of: ${field.enumValues!.join(', ')}`;
+  errors.push(mqlError('validate', `'${valueText(v)}' is not a valid ${field.name} — ${suffix}`, p.span.start, p.span.end));
 }
 
 function checkNumberRange(v: Value, field: ResolvedField, p: Predicate, errors: MqlError[]): void {
@@ -77,8 +82,12 @@ function checkOrderBy(query: Query, reg: FieldRegistry, errors: MqlError[]): voi
   const key = query.orderBy?.key;
   if (!key || typeof key === 'string') return; // relevance/recency/quality are built-in
   const field = reg.resolve(key.field);
-  if (!field) errors.push(mqlError('validate', `cannot order by unknown field '${key.field}'`, 0, 0));
-  else if (!field.sortable) errors.push(mqlError('validate', `field '${field.name}' is not sortable`, 0, 0));
+  if (!field) {
+    const hint = nearestName(key.field, reg.allNames());
+    errors.push(mqlError('validate', `cannot order by unknown field '${key.field}'${hint ? ` — did you mean '${hint}'?` : ''}`, 0, 0));
+  } else if (!field.sortable) {
+    errors.push(mqlError('validate', `field '${field.name}' is not sortable`, 0, 0));
+  }
 }
 
 function valueMatchesType(v: Value, type: FieldType): boolean {

@@ -85,4 +85,13 @@ export class FieldRegistry {
   fields(): readonly FieldDef[] {
     return [...new Set(this.byName.values())];
   }
+
+  /** Every accepted field name and alias — for autocomplete + "did you mean". */
+  allNames(): string[] {
+    const names: string[] = [];
+    for (const f of this.fields()) {
+      names.push(f.name, ...(f.aliases ?? []));
+    }
+    return names;
+  }
 }

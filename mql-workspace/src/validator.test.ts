@@ -35,6 +35,13 @@ describe('validator — rejects invalid queries', () => {
   it('rejects unknown fields', () => {
     expect(errorsOf('bogus:1')).toEqual([expect.stringMatching(/unknown field 'bogus'/)]);
   });
+  it('suggests the closest field name for a typo', () => {
+    expect(errorsOf('qualiti>0.5')).toEqual([expect.stringMatching(/unknown field 'qualiti' — did you mean 'quality'\?/)]);
+    expect(errorsOf('spac:work')).toEqual([expect.stringMatching(/did you mean 'space'\?/)]);
+  });
+  it('suggests the closest enum value', () => {
+    expect(errorsOf('origin:wrk')).toEqual([expect.stringMatching(/did you mean 'work'\?/)]);
+  });
   it('rejects ordering operators on text fields', () => {
     expect(errorsOf('type>5')).toEqual([expect.stringMatching(/operator '>' not allowed on 'type'/)]);
   });
