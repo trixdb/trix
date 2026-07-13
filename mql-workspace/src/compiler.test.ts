@@ -62,8 +62,10 @@ describe('compiler — SQL path (net-new composition the flat surface lacks)', (
   it('compiles a realistic composed query with grouping', () => {
     const p = plan('(entity:"Alice" or entity:"Bob") and quality>=0.7 and event_date between 2026-01-01 and 2026-03-31');
     expect(p.flatCompatible).toBe(false);
+    const entity = (n: string) =>
+      `EXISTS (SELECT 1 FROM memory_facts mf JOIN fact_entities fe ON fe.fact_id = mf.id JOIN memory_entities me ON me.id = fe.entity_id WHERE mf.memory_id = m.id AND me.name = ${n})`;
     expect(p.where!.sql).toBe(
-      "((EXISTS (SELECT 1 FROM memory_entities g WHERE g.memory_id = m.id AND g.name = $1) OR EXISTS (SELECT 1 FROM memory_entities g WHERE g.memory_id = m.id AND g.name = $2)) AND m.quality_score >= $3 AND m.event_date BETWEEN $4 AND $5)",
+      `((${entity('$1')} OR ${entity('$2')}) AND m.quality_score >= $3 AND m.event_date BETWEEN $4 AND $5)`,
     );
     expect(p.where!.params).toEqual(['Alice', 'Bob', 0.7, '2026-01-01T00:00:00.000Z', '2026-03-31T00:00:00.000Z']);
   });

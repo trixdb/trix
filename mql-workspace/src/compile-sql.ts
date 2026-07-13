@@ -70,13 +70,28 @@ function emitTag(col: string, p: Predicate, o: SqlOptions, push: Push): string {
   return `${push(scalar(p.value, o))} = ANY(${col})`;
 }
 
-/** entity/topic are graph joins; emit a host-tunable EXISTS correlated on memory id. */
+/** entity/topic are graph joins; emit an EXISTS correlated on the memory id. */
 function emitGraph(field: ResolvedField, p: Predicate, o: SqlOptions, push: Push): string {
-  const table = field.name === 'entity' ? 'memory_entities' : 'memory_topics';
   const idCol = `${o.tableAlias}.id`;
-  if (p.op === 'in')
-    return `EXISTS (SELECT 1 FROM ${table} g WHERE g.memory_id = ${idCol} AND g.name = ANY(${push(listValues(p.value, o))}))`;
-  return `EXISTS (SELECT 1 FROM ${table} g WHERE g.memory_id = ${idCol} AND g.name = ${push(scalar(p.value, o))})`;
+  return field.name === 'entity'
+    ? emitEntityExists(idCol, p, o, push)
+    : emitTopicExists(idCol, p, o, push);
+}
+
+/** memory -> memory_facts -> fact_entities -> memory_entities (name match). */
+function emitEntityExists(idCol: string, p: Predicate, o: SqlOptions, push: Push): string {
+  const match = p.op === 'in'
+    ? `me.name = ANY(${push(listValues(p.value, o))})`
+    : `me.name = ${push(scalar(p.value, o))}`;
+  return `EXISTS (SELECT 1 FROM memory_facts mf JOIN fact_entities fe ON fe.fact_id = mf.id JOIN memory_entities me ON me.id = fe.entity_id WHERE mf.memory_id = ${idCol} AND ${match})`;
+}
+
+/** topics live in enrichments.result->'topics' JSONB (enrichment_type='topics'). */
+function emitTopicExists(idCol: string, p: Predicate, o: SqlOptions, push: Push): string {
+  const match = p.op === 'in'
+    ? `t->>'name' = ANY(${push(listValues(p.value, o))})`
+    : `t->>'name' = ${push(scalar(p.value, o))}`;
+  return `EXISTS (SELECT 1 FROM enrichments e, jsonb_array_elements(e.result->'topics') t WHERE e.memory_id = ${idCol} AND e.enrichment_type = 'topics' AND e.status = 'completed' AND ${match})`;
 }
 
 function scalar(v: Value | readonly Value[], o: SqlOptions): string | number | boolean {
