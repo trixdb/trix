@@ -50,7 +50,8 @@ function emit(node: Expr, reg: FieldRegistry, o: SqlOptions, push: Push): string
 }
 
 function emitPredicate(p: Predicate, reg: FieldRegistry, o: SqlOptions, push: Push): string {
-  const field = reg.resolve(p.field)!; // validated upstream
+  const field = reg.resolve(p.field);
+  if (!field) throw new Error(`MQL compile invariant: unresolved field '${p.field}' (validate before compile)`);
   const col = `${o.tableAlias}.${field.target ?? field.name}`;
   if (field.name === 'content') return `${col} @@ plainto_tsquery('english', ${push(scalar(p.value, o))})`;
   if (field.name === 'entity' || field.name === 'topic') return emitGraph(field, p, o, push);

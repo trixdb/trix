@@ -13,6 +13,7 @@
   },
   "license": "UNLICENSED",
   "devDependencies": {
+    "fast-check": "^4.9.0",
     "pg-mem": "^3.0.14",
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"

@@ -14,6 +14,7 @@ export * from './query-plan.js';
 export { parse } from './parser.js';
 export { validate } from './validator.js';
 export { compile } from './compiler.js';
+export { print } from './printer.js';
 export { trixMemoryRegistry } from './fields.js';
 export { lex } from './lexer.js';
 
