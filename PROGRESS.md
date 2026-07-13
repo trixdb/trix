@@ -74,11 +74,28 @@ Next-iter builds the *feasible* last-mile: a pure adapter + a ready-to-apply ADR
 5. Consider: geo predicates (lat/long/geohash cols exist), saved-MQL (reuse saved_searches),
    `explain` output (human description of a compiled plan).
 
-## Assessment: approaching diminishing returns for THIS worktree
-Core library is complete + hardened (parse/validate/compile/print, 71 tests, real-DB exec,
-fuzzed). Remaining high-value work (endpoint wiring, port) requires the main trix-api checkout,
-not this worktree. Iter 3 should do the adapter + ADR (feasible here), then the loop likely
-winds down until a human ports it into trix-api proper.
+### Iter 3 (cont.) — NL→MQL capstone ✅
+- `nl-to-mql.ts`: utterance → validated MQL via injectable LLM + bounded self-repair loop
+  (data-driven prompt from the registry). 5 tests with a scripted model. 84 tests total.
+
+## STATUS: COMPLETE for this worktree — loop wound down (cron 3cd84ee8 deleted)
+Everything feasible here is DONE and validated. Full pipeline built + hardened:
+lex→parse→validate→compile(flat+SQL)→print→search-request adapter→NL→MQL. **84 tests / 2
+skipped** (unit + real-DB integration via pg-mem + fast-check fuzzing + LLM self-repair),
+strict typecheck clean, 9 commits on `feat/mql`. Hypothesis **CONFIRMED** (machine-checked
+value matrix + real-DB execution): 11/15 realistic intents need capability the flat surface
+lacks. See VERDICT.md, README.md, WIRING_ADR.md.
+
+## Handoff — remaining work needs the MAIN trix-api checkout (not this worktree)
+A future session in `/data/code/trix/trix-api` (checked out) should:
+1. Port `mql-workspace/src` → `trix-api/src/lib/mql/` (align vitest; keep it dep-free).
+2. Apply `WIRING_ADR.md`: add `?mql=` to GET /v1/memories (4 files; clears the >3-file gate
+   with sign-off). The `integration.test.ts` fixture ports directly — its 2 skipped
+   correlated-EXISTS cases will PASS on real Postgres.
+3. Expose `mql` in the MCP `search_memories` tool + SDKs (one grammar, every surface).
+4. Optional polish (only if pulled): geo predicates (lat/long/geohash cols exist),
+   `explain()` plan descriptions (build on printer.ts), saved-MQL (reuse saved_searches).
+To resume autonomous iteration, re-run `/loop` pointing at the main trix-api checkout.
 
 ## Key decisions (stable)
 - Compile to existing flat filter object when pure-AND; else parameterised SQL fragment
