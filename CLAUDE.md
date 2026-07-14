@@ -25,7 +25,7 @@ Key constraints:
 | `trix-sdk-typescript` | TypeScript SDK — 31 endpoints, production-ready |
 | `trix-sdk-csharp` | .NET SDK (NuGet: Trix.Client) |
 | `trix-workers-node` | Node/BullMQ workers — I/O + coordination (transcription, embeddings, integrations, billing); **bridges clustering/cluster-ops to `trix-workers`** by writing `pending` rows |
-| `trix-workers` | **Active** Python/taskiq ML workers — HDBSCAN clustering (computes the runs `trix-workers-node` bridges to it), community + anomaly detection, temporal patterns, multi-scale clustering, Hebbian co-activation, replay, event-stream. **Load-bearing, NOT legacy** — turning it off strands clustering/cluster-ops as `pending` forever. Complements `trix-workers-node`. ⚠️ decay/consolidation/relationship-decay are duplicated in BOTH services (no mutual-exclusion) — single-owner cleanup pending |
+| `trix-workers` | **Active** Python/taskiq ML workers — HDBSCAN clustering (computes the runs `trix-workers-node` bridges to it), community + anomaly detection, temporal patterns, multi-scale clustering, Hebbian co-activation, replay, event-stream. **Load-bearing, NOT legacy** — turning it off strands clustering/cluster-ops as `pending` forever. Complements `trix-workers-node`. **Single-owner (workers#36):** Python owns decay / relationship-decay / dedup; Node owns prune / cleanup / auto_relate. The residual cross-owner code paths are gated OFF by default (Python prune behind `consolidation_allow_prune`, Node dedup behind `CONSOLIDATION_ALLOW_DEDUP`) and Node's consolidation validation rejects Python-owned task names |
 | `trix-bots` | Bot/agent execution worker service |
 | `trix-daemon` | Background daemon |
 | `trix-settings` | Wails v2 settings app for trix-daemon |
