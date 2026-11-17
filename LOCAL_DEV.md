@@ -5,17 +5,13 @@ Complete guide to running the full Trix stack on your machine using Docker.
 ## Prerequisites
 
 - **Docker** (with Compose v2)
-- **Node.js 20+** and **Bun** (for trix-app frontend)
 - **Railway CLI** (optional, for pulling API keys): `npm i -g @railway/cli`
 
 ## Quick Start
 
 ```bash
-# 1. First-time setup — generates .env.local with API keys from Railway
+# First-time setup — generates .env.local with API keys from Railway
 ./scripts/local-setup.sh --railway
-
-# 2. Start the frontend dev server
-cd trix-app && bun dev
 ```
 
 That's it. The setup script handles Docker, migrations, subscriptions, and health checks.
@@ -38,15 +34,6 @@ That's it. The setup script handles Docker, migrations, subscriptions, and healt
 | API | trix-local-api | 13737 | Fastify backend, runs migrations on startup |
 | Workers | trix-local-workers-node | 19091 | BullMQ job processors |
 | Bots | trix-local-bots | 13739 | Agent/bot runtime |
-
-### Frontend (local, not Docker)
-
-| Service | Port | Command |
-|---------|------|---------|
-| trix-app (Retrix) — dev | 5173 | `cd trix-app && bun dev` |
-| trix-app (Retrix) — preview/prod | 4737 | `cd trix-app && bun run build && bun run start` |
-
-The Vite dev server proxies `/auth`, `/v1`, `/ws` to the local API at `localhost:13737`.
 
 ## Step-by-Step Setup
 
@@ -89,26 +76,7 @@ docker compose up -d infra
 docker compose --profile ml up -d
 ```
 
-### 4. Start the Frontend
-
-```bash
-cd trix-app
-bun install   # first time only
-bun dev       # starts on http://localhost:5173
-```
-
-### 5. Log In
-
-Open http://localhost:5173 and log in with the test account:
-
-| Field | Value |
-|-------|-------|
-| Email | `robert@zivrio.com` |
-| Password | `123qwe!"#QWE` |
-
-This account is pre-registered on the local stack with a pro subscription and 999k credits. You can also register a new account — the local instance has `REQUIRE_INVITE_CODE=false` so no invite code is needed.
-
-### 6. Set Up Bots (if needed)
+### 4. Set Up Bots (if needed)
 
 After registering, create an API key for the bot service:
 
@@ -186,7 +154,6 @@ All containers use the `trix-local-*` prefix. This avoids name clashes with per-
 - **API** runs migrations automatically on startup (`AUTO_MIGRATE=true`).
 - **Workers** connect to infrastructure via Docker internal hostnames (`postgres`, `valkey`, etc.), not `localhost`.
 - **Bots** needs `TRIX_ALLOW_INSECURE=true` to connect to the API over HTTP (not HTTPS).
-- **trix-app** uses Vite's dev proxy to route API requests. `VITE_API_URL` must be empty so requests go through the proxy instead of making direct cross-origin calls.
 - The setup script auto-seeds a **pro subscription with 999k credits** so AI chat works immediately without billing setup.
 
 ## Troubleshooting
@@ -204,9 +171,6 @@ The user needs a subscription. The setup script seeds this automatically. If you
 
 ### AI chat returns 503
 A required LLM provider API key is missing. The complexity-aware routing sends simple queries to Gemini even when `LLM_PROVIDER=anthropic`. Ensure `GOOGLE_API_KEY` is set.
-
-### trix-app shows CORS errors
-Make sure `VITE_API_URL` is empty in `trix-app/.env`. The Vite dev proxy handles routing — direct API URLs cause cross-origin issues.
 
 ### Container name conflicts
 If you see "container name already in use", old containers from submodule compose files may conflict. Remove them: `docker rm -f <conflicting-container>`.
