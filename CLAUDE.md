@@ -39,6 +39,19 @@ Key constraints:
 
 Each subproject has its own CLAUDE.md with specific instructions. When working in a subproject, also check its local CLAUDE.md for project-specific commands and patterns.
 
+## Working on GitHub Issues
+
+Whether you or a spawned agent picks up an issue, follow this workflow — it stops wasted work on stale premises and keeps the tracker trustworthy:
+
+1. **Read the whole issue first** — body, **all comments**, and linked issues/PRs (`gh issue view <n> --repo <repo> --comments`). Premises go stale; a later comment often supersedes the original (line counts, "still broken" claims, scope).
+2. **Verify before touching code — never assume the issue is right.** Confirm the cited `file:line`/symbol still exists (it drifts) and check the claim against current `origin/main`. For "is this already fixed?" verify against current code/prod, not the issue's stated status.
+3. **Reproduce bugs before fixing.** Write a failing test (or a concrete repro) that captures the bug, confirm it fails on current `main`, then confirm your fix flips it to green. State the repro level you achieved in the PR.
+4. **Follow the issue's steps and suggested fix.** Implement the proposed approach/SQL/fix unless you can justify a better one (explain any deviation in the PR), and meet every stated **acceptance criterion** explicitly.
+5. **Never mask a problem to close an issue.** Don't weaken/skip a test or swallow an error to get green — fix the root cause. If you find a *separate* real bug while working, **file a focused, fully-detailed issue** (repro + evidence + suggested fix + labels) instead of silently fixing it or ignoring it.
+6. **Keep the tracker curated.** Before starting: `gh issue edit <n> --add-assignee devghost`. Every issue you file or touch should be **fully labeled** — `type/*`, `area/*`, `priority/P0–P3`, `effort/*` — with a clear summary, reproduction steps, evidence, and a suggested fix, plus links to related issues. **Close only with evidence** (the fixing PR/commit + a verification note), never on assumption.
+7. **PR hygiene.** Base `main`; **don't self-merge** — open the PR for review. Title ≤100 chars with a scope from the repo's commitlint enum; body ends with `Closes #N`. Run `prettier`/`eslint` before pushing rather than leaning on `--no-verify` to skip them (see the repo's `.claude/rules.md` / local CLAUDE.md).
+8. **Scope.** Follow [CODING_STANDARDS.md](./CODING_STANDARDS.md) — file/function size limits, only the change the issue asks for, and if a fix touches >3 files, pause and discuss the approach.
+
 ## Submodules
 
 All subprojects are git submodules. For day-to-day operations (cloning, bumping
