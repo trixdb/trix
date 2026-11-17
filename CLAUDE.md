@@ -29,7 +29,6 @@ Key constraints:
 | `trix-bots` | Bot/agent execution worker service |
 | `trix-daemon` | Background daemon |
 | `trix-settings` | Wails v2 settings app for trix-daemon |
-| `trix-app` | Web application |
 | `trix-cli-admin` | Admin CLI (waitlist, onboarding via Loops.so) |
 | `trix-landing` | Landing page |
 | `trix-visual-embeddings` | SigLIP 2 visual embedding service |

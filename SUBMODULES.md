@@ -11,7 +11,6 @@ pattern.
 |---|---|---|
 | `shannon` | `trixdb/shannon` (fork of `KeygraphHQ/shannon`) | See [Shannon fork](#shannon-fork) below |
 | `trix-api` | `trixdb/trix-api` | Backend API (Fastify + Postgres) |
-| `trix-app` | `trixdb/trix-app` | Web app (SvelteKit) |
 | `trix-bots` | `trixdb/trix-bots` | Bot/agent execution worker |
 | `trix-cli-admin` | `trixdb/trix-cli-admin` | Admin CLI (waitlist, onboarding) |
 | `trix-cli-go` | `trixdb/trix-cli-go` | End-user CLI (Go) |
@@ -136,9 +135,8 @@ gh pr create --repo KeygraphHQ/shannon --base main
   Previously only `trix-bots` was registered, so the other ~20 (including
   `trix-landing`) had to be cloned by hand — no longer necessary.
 
-- **All submodules are under the `trixdb` org.** (`trix-app` and `trix-sdk-go`
-  were migrated from `devghost` → `trixdb` on 2026-06-26.) `trix-app` is a
-  private repo, so you need `trixdb`-org access to clone it.
+- **All submodules are under the `trixdb` org.** (`trix-sdk-go`
+  was migrated from `devghost` → `trixdb` on 2026-06-26.)
 
 - **`shannon`** is registered with `branch = trix/main` (our adapted fork
   branch). `git submodule update --init` checks out the superproject-pinned

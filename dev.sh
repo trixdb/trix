@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start Trix dev environment: infra + API + frontend
+# Start Trix dev environment: infra + API
 # Usage: ./dev.sh
 
 set -e
@@ -22,7 +22,7 @@ done
 echo -e "${GREEN}Postgres ready${NC}"
 
 # Kill stale processes on our ports
-for port in 3737 5173; do
+for port in 3737; do
   pid=$(lsof -ti :$port 2>/dev/null || true)
   if [ -n "$pid" ]; then
     echo "Killing stale process on :$port (pid $pid)"
@@ -44,20 +44,12 @@ until curl -sf http://localhost:3737/health >/dev/null 2>&1; do
 done
 echo -e "${GREEN}API ready on :3737${NC}"
 
-# Start frontend
-echo -e "${CYAN}Starting frontend on :5173...${NC}"
-cd "$SCRIPT_DIR/trix-app"
-bun run dev &
-APP_PID=$!
-
-sleep 3
 echo ""
 echo -e "${GREEN}=== Trix dev environment ready ===${NC}"
 echo -e "  API:      http://localhost:3737"
-echo -e "  Frontend: http://localhost:5173"
 echo ""
 echo "Press Ctrl+C to stop all"
 
 # Cleanup on exit
-trap "kill $API_PID $APP_PID 2>/dev/null; echo 'Stopped'" EXIT INT TERM
+trap "kill $API_PID 2>/dev/null; echo 'Stopped'" EXIT INT TERM
 wait

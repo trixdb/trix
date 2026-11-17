@@ -8,9 +8,6 @@
 [submodule "trix-api"]
 	path = trix-api
 	url = git@github.com:trixdb/trix-api.git
-[submodule "trix-app"]
-	path = trix-app
-	url = git@github.com:trixdb/trix-app.git
 [submodule "trix-bots"]
 	path = trix-bots
 	url = git@github.com:trixdb/trix-bots.git
