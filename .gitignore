@@ -48,3 +48,6 @@ logs/
 # Playwright
 .playwright-cli/
 .playwright-mcp/
+
+# Claude Code runtime session lock (never track)
+.claude/scheduled_tasks.lock
