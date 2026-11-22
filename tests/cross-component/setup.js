@@ -133,11 +133,13 @@ export async function initializeDatabase(pool) {
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
         content TEXT NOT NULL,
+        content_type VARCHAR(50) DEFAULT 'text',
         embedding vector(1536),
         embedding_status VARCHAR(50) DEFAULT 'pending',
         embedding_error TEXT,
         has_chunks BOOLEAN DEFAULT false,
         metadata JSONB DEFAULT '{}',
+        tags TEXT[] DEFAULT '{}',
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       )
