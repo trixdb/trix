@@ -47,6 +47,12 @@ class ProjectForShortId(unittest.TestCase):
             self.assertIn(r["merge"], fleet.MERGE_MODES, name)
             self.assertIsInstance(r["required_checks"], list, name)
 
+    def test_workers_node_ignores_the_chronic_npm_audit_checks(self):
+        # NPM Audit / Validate / CI Summary are red repo-wide (moderate dep
+        # vulns), merged through; the gate must report but not block on them.
+        ign = fleet.REPOS["trixdb/trix-workers-node"]["ignore_checks"]
+        self.assertEqual(set(ign), {"NPM Audit", "Validate", "CI Summary"})
+
     def test_all_projects_report_production_env(self):
         # All four init Sentry with environment defaulting to production.
         for alias, p in fleet.PROJECTS.items():

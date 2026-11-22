@@ -66,7 +66,15 @@ short SHA, which `release_placement` still resolves). PII is scrubbed in
 
 ### trixdb/trix-workers-node (Node/BullMQ workers)
 - Package manager **npm**. CI `ci.yml` (Lint & Format, Metered-calls guard,
-  Test matrix) + `security.yml`. No commitlint — use a conventional title.
+  Test matrix with postgres+redis services, Test Coverage, Docker Build) +
+  `security.yml`. No commitlint — use a conventional title.
+- **Known-red checks (in `ignore_checks`): `NPM Audit`, `Validate`, `CI Summary`**
+  — all trace to `npm audit --audit-level=moderate` finding moderate dep vulns
+  (a deps condition, not code). The team merges through them (e.g. PR #188).
+  The real signal is Test (Node 22/23), Test Coverage, Lint & Format, Docker
+  Build and the security scans. Remove an entry from `ignore_checks` once it
+  passes. **Pre-push hook runs the full suite and fails without DB/Redis — push
+  with `--no-verify`** (monorepo CLAUDE.md).
 - Bridges clustering/cluster-ops to the Python `trix-workers` by writing
   `pending` rows; single-owner split (Node owns prune/cleanup/auto_relate,
   Python owns decay/relationship-decay/dedup). A worker/task-name fix may have a
