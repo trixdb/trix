@@ -28,6 +28,31 @@ PostgreSQL), `trix-mcp`, `trix-cli-go`, `trix-workers-node` (Node I/O +
 coordination), `trix-workers` (Python ML — **load-bearing, not legacy**),
 `trix-bots`, `trix-landing`, plus the SDKs. The full table is in `CLAUDE.md`.
 
+## How to work (every task)
+
+1. **Plan first.** Before editing anything, state the goal, the files/behaviour
+   in play, and the concrete steps. No code until the plan is clear.
+2. **Be critical — never assume, guess, or appease.** Verify every claim (issue
+   text, a cited `file:line`, an "it's already fixed") against current
+   `origin/main` and the running code. Dig until you are **100% certain** of the
+   root cause; if you're not sure, keep investigating — don't paper over it or
+   tell the human what they want to hear.
+3. **Drive with TDD.** Write a failing test that captures the intended
+   behaviour/bug, watch it fail, make it pass, keep it green. Nothing lands
+   without a test that would catch its regression; never weaken or skip a test
+   to go green.
+4. **Then iterate to improve (~5 passes).** Once it works and tests are green,
+   make several refactor passes over the code you touched: sound architecture,
+   Clean Code (clear names, small functions, no duplication), modular /
+   componentised units built for **reuse**, and structure/UI that is easy to
+   maintain. Every pass keeps the tests green. Stay inside the scope and
+   coupling limits above — a refactor that would sprawl past **> 3 files** or
+   beyond the task is separate work (see point 5), not scope creep.
+5. **File what you can't finish.** Any real bug, debt, or improvement you
+   surface but can't complete in the current scope → open a focused GH issue
+   (repro + evidence + suggested fix + full labels). Never silently drop, bury,
+   or quietly fix it on the side.
+
 ## Working on GitHub issues
 
 Read the whole issue (body + **all** comments + linked PRs) first; verify every

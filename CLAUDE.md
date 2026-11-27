@@ -39,6 +39,16 @@ Key constraints:
 
 Each subproject has its own CLAUDE.md with specific instructions. When working in a subproject, also check its local CLAUDE.md for project-specific commands and patterns.
 
+## How to Work (every task)
+
+This applies to **every** agent and every task, on top of the [coding standards](./CODING_STANDARDS.md) above.
+
+1. **Plan first.** Before editing anything, state the goal, the files/behaviour in play, and the concrete steps. No code until the plan is clear.
+2. **Be critical — never assume, guess, or appease.** Verify every claim (issue text, a cited `file:line`, an "it's already fixed") against current `origin/main` and the actually-running code. Dig until you are **100% certain** of the root cause; if you aren't sure, keep investigating — don't paper over it, and don't tell the human what they want to hear.
+3. **Drive with TDD.** Write a failing test that captures the intended behaviour or reproduces the bug, watch it fail, make it pass, keep it green. Nothing lands without a test that would catch its regression. **Never weaken, skip, or delete a test to go green** — fix the root cause (this is the same rule as "never mask a problem", below).
+4. **Then iterate to improve (~5 passes).** Once it works and the tests are green, make several refactor passes over the code you touched: sound architecture, Clean Code (clear names, small functions, no duplication), modular / componentised units built for **reuse**, and structure/UI that is easy to maintain. Every pass must keep the tests green. Stay inside the **file/function size** and **> 3 files → pause** limits above — the `~5 passes` tighten the code you already touched, they are **not** a licence for speculative, repo-wide refactors. Anything larger is separate work → point 5.
+5. **File what you can't finish.** Any real bug, tech debt, or improvement you surface but can't complete within the current scope → open a **focused** GH issue (repro + evidence + suggested fix + full `type/*`/`area/*`/`priority/*`/`effort/*` labels). Never silently drop it, bury it in an unrelated PR, or quietly fix it on the side.
+
 ## Working on GitHub Issues
 
 Whether you or a spawned agent picks up an issue, follow this workflow — it stops wasted work on stale premises and keeps the tracker trustworthy:
